@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — CropIQ</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body class="auth-body">
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="18" fill="var(--green-600)"/>
+            <path d="M18 8C18 8 10 14 10 20C10 24.4 13.6 28 18 28C22.4 28 26 24.4 26 20C26 14 18 8 18 8Z" fill="white" opacity="0.9"/>
+            <path d="M18 14V28" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 20L14 16" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 22L22 18" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="logo-text">CropIQ</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- AUTH PAGE WRAPPER -->
+  <div class="auth-page">
+
+    <!-- Reuse hero background decorations -->
+    <div class="auth-bg-decor">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+      <div class="hero-grid"></div>
+    </div>
+
+    <!-- AUTH CARD -->
+    <div class="auth-card" id="authCard">
+
+      <!-- Logo inside card -->
+      <div class="auth-card-logo">
+        <div class="logo-mark" style="width:44px;height:44px;">
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="18" fill="var(--green-600)"/>
+            <path d="M18 8C18 8 10 14 10 20C10 24.4 13.6 28 18 28C22.4 28 26 24.4 26 20C26 14 18 8 18 8Z" fill="white" opacity="0.9"/>
+            <path d="M18 14V28" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 20L14 16" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 22L22 18" stroke="var(--green-600)" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="auth-tabs" id="authTabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Create Account</button>
+        <div class="auth-tab-slider" id="tabSlider"></div>
+      </div>
+
+      <!-- ====== LOGIN PANEL ====== -->
+      <div class="auth-panel" id="panelLogin">
+        <div class="auth-heading">
+          <h1 class="auth-title">Welcome back</h1>
+          <p class="auth-sub">Sign in to access your crop advisor</p>
+        </div>
+
+        <div class="auth-error-banner" id="loginError" role="alert">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          <span id="loginErrorMsg">Invalid email or password.</span>
+        </div>
+
+        <div class="auth-form">
+
+          <div class="auth-form-group">
+            <label for="loginEmail">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+              Email address
+            </label>
+            <input type="email" id="loginEmail" placeholder="you@example.com"
+                   autocomplete="email" onkeydown="enterSubmit(event,'handleLogin')" />
+          </div>
+
+          <div class="auth-form-group">
+            <label for="loginPassword">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+              Password
+            </label>
+            <div class="auth-input-wrap">
+              <input type="password" id="loginPassword" placeholder="••••••••"
+                     autocomplete="current-password" onkeydown="enterSubmit(event,'handleLogin')" />
+              <button class="toggle-pw" type="button"
+                      onclick="togglePassword('loginPassword',this)" aria-label="Toggle password">
+                <svg class="eye-show" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                <svg class="eye-hide" viewBox="0 0 20 20" fill="currentColor" style="display:none"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"/><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-remember-row">
+            <label class="auth-checkbox-label">
+              <input type="checkbox" id="rememberMe" />
+              <span class="auth-checkmark"></span>
+              Remember me
+            </label>
+            <button class="auth-forgot" type="button" onclick="showForgotModal()">Forgot password?</button>
+          </div>
+
+          <button class="auth-submit-btn" id="loginBtn" onclick="handleLogin()">
+            <span class="auth-btn-text">Sign In</span>
+            <span class="auth-btn-spinner">
+              <svg class="spinner-svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="30 70" stroke-linecap="round"/></svg>
+              Signing in...
+            </span>
+          </button>
+        </div>
+
+        <p class="auth-switch-text">
+          Don't have an account?
+          <button type="button" onclick="switchTab('register')">Create one free</button>
+        </p>
+      </div>
+
+      <!-- ====== REGISTER PANEL ====== -->
+      <div class="auth-panel" id="panelRegister" style="display:none;">
+        <div class="auth-heading">
+          <h1 class="auth-title">Create account</h1>
+          <p class="auth-sub">Join CropIQ — free forever</p>
+        </div>
+
+        <div class="auth-error-banner" id="registerError" role="alert">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          <span id="registerErrorMsg">Something went wrong.</span>
+        </div>
+
+        <div class="auth-success-banner" id="registerSuccess" role="status">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span id="registerSuccessMsg">Account created! Signing you in...</span>
+        </div>
+
+        <div class="auth-form">
+
+          <div class="auth-form-group">
+            <label for="regName">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+              Full name
+            </label>
+            <input type="text" id="regName" placeholder="e.g. Arjun Sharma"
+                   autocomplete="name" onkeydown="enterSubmit(event,'handleRegister')" />
+          </div>
+
+          <div class="auth-form-group">
+            <label for="regEmail">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+              Email address
+            </label>
+            <input type="email" id="regEmail" placeholder="you@example.com"
+                   autocomplete="email" onkeydown="enterSubmit(event,'handleRegister')" />
+          </div>
+
+          <div class="auth-form-group">
+            <label for="regPassword">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+              Password
+            </label>
+            <div class="auth-input-wrap">
+              <input type="password" id="regPassword" placeholder="Min 6 characters"
+                     autocomplete="new-password" oninput="checkPasswordStrength(this.value)"
+                     onkeydown="enterSubmit(event,'handleRegister')" />
+              <button class="toggle-pw" type="button"
+                      onclick="togglePassword('regPassword',this)" aria-label="Toggle password">
+                <svg class="eye-show" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                <svg class="eye-hide" viewBox="0 0 20 20" fill="currentColor" style="display:none"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"/><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/></svg>
+              </button>
+            </div>
+            <!-- Password strength indicator -->
+            <div class="pw-strength-wrap" id="pwStrengthWrap" style="display:none;">
+              <div class="pw-strength-bar">
+                <div class="pw-strength-fill" id="pwStrengthFill"></div>
+              </div>
+              <span class="pw-strength-label" id="pwStrengthLabel">Weak</span>
+            </div>
+          </div>
+
+          <div class="auth-form-group">
+            <label for="regConfirm">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              Confirm password
+            </label>
+            <input type="password" id="regConfirm" placeholder="Re-enter password"
+                   autocomplete="new-password" onkeydown="enterSubmit(event,'handleRegister')" />
+          </div>
+
+          <button class="auth-submit-btn" id="registerBtn" onclick="handleRegister()">
+            <span class="auth-btn-text">Create Account</span>
+            <span class="auth-btn-spinner">
+              <svg class="spinner-svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="30 70" stroke-linecap="round"/></svg>
+              Creating account...
+            </span>
+          </button>
+        </div>
+
+        <p class="auth-switch-text">
+          Already have an account?
+          <button type="button" onclick="switchTab('login')">Sign in</button>
+        </p>
+      </div>
+
+    </div><!-- /auth-card -->
+  </div><!-- /auth-page -->
+
+  <!-- ====== FORGOT PASSWORD MODAL ====== -->
+  <div class="modal-overlay" id="forgotModal" onclick="closeForgotOnOverlay(event)">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" onclick="closeForgotModal()" aria-label="Close modal">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </button>
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z"/></svg>
+      </div>
+      <h3 class="modal-title" id="modalTitle">Reset Password</h3>
+      <p class="modal-sub">Enter your registered email. We'll send a reset link instantly.</p>
+
+      <div class="auth-error-banner" id="forgotError" role="alert">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        <span id="forgotErrorMsg">No account found with that email.</span>
+      </div>
+      <div class="auth-success-banner" id="forgotSuccess" role="status">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        <span>Reset link sent! Check your inbox.</span>
+      </div>
+
+      <div class="auth-form-group" style="margin-top:8px;">
+        <label for="forgotEmail">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+          Email address
+        </label>
+        <input type="email" id="forgotEmail" placeholder="you@example.com"
+               onkeydown="enterSubmit(event,'handleForgot')" />
+      </div>
+
+      <button class="auth-submit-btn" id="forgotBtn" onclick="handleForgot()" style="margin-top:4px;">
+        <span class="auth-btn-text">Send Reset Link</span>
+        <span class="auth-btn-spinner">
+          <svg class="spinner-svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="30 70" stroke-linecap="round"/></svg>
+          Sending...
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>
