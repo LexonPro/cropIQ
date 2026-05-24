@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>CropIQ — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --green-50:#f0fdf4;--green-100:#dcfce7;--green-200:#bbf7d0;
+      --green-500:#22c55e;--green-600:#16a34a;--green-700:#15803d;
+      --green-800:#166534;--gray-50:#f9fafb;--gray-100:#f3f4f6;
+      --gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;
+      --gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;
+      --gray-800:#1f2937;--gray-900:#111827;
+      --font-d:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
+      --radius:12px;--shadow:0 4px 16px rgba(0,0,0,.08);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-b);background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+
+    /* ── LOGIN SCREEN ── */
+    #loginScreen{
+      display:flex;align-items:center;justify-content:center;
+      min-height:100vh;padding:20px;
+      background:linear-gradient(135deg,#fff 0%,var(--green-50) 100%);
+    }
+    .login-card{
+      background:#fff;border:1px solid var(--gray-200);border-radius:20px;
+      box-shadow:0 10px 40px rgba(0,0,0,.1);padding:40px;width:100%;max-width:400px;
+    }
+    .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+    .login-logo span{font-family:var(--font-d);font-size:1.4rem;font-weight:800;color:var(--green-800)}
+    .login-title{font-family:var(--font-d);font-size:1.4rem;font-weight:800;color:var(--gray-900);margin-bottom:6px}
+    .login-sub{font-size:.88rem;color:var(--gray-400);margin-bottom:24px}
+    .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+    .field label{font-size:.82rem;font-weight:600;color:var(--gray-700)}
+    .field input{
+      height:44px;padding:0 14px;font-family:var(--font-b);font-size:.9rem;
+      background:var(--gray-50);border:1.5px solid var(--gray-200);
+      border-radius:10px;outline:none;color:var(--gray-800);
+      transition:.2s;
+    }
+    .field input:focus{border-color:var(--green-400);background:#fff;box-shadow:0 0 0 3px rgba(74,222,128,.15)}
+    .btn-green{
+      width:100%;height:46px;background:var(--green-600);color:#fff;
+      border:none;border-radius:10px;font-family:var(--font-b);
+      font-size:.93rem;font-weight:600;cursor:pointer;
+      transition:.2s;box-shadow:0 8px 24px rgba(22,163,74,.2);
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .btn-green:hover{background:var(--green-700);transform:translateY(-1px)}
+    .login-error{
+      background:#fef2f2;border:1px solid #fecaca;border-radius:8px;
+      padding:10px 14px;font-size:.83rem;color:#b91c1c;
+      margin-bottom:16px;display:none;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard{display:none}
+
+    .topbar{
+      position:sticky;top:0;z-index:100;
+      background:rgba(255,255,255,.92);backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--gray-200);
+      padding:0 28px;height:60px;
+      display:flex;align-items:center;justify-content:space-between;
+    }
+    .topbar-logo{display:flex;align-items:center;gap:9px}
+    .topbar-logo span{font-family:var(--font-d);font-weight:800;font-size:1.1rem;color:var(--green-800)}
+    .topbar-logo small{
+      background:var(--green-100);color:var(--green-700);
+      font-size:.68rem;font-weight:700;padding:2px 8px;
+      border-radius:100px;letter-spacing:.06em;text-transform:uppercase;
+    }
+    .topbar-right{display:flex;align-items:center;gap:12px}
+    .admin-pill{
+      display:flex;align-items:center;gap:7px;
+      background:var(--green-50);border:1px solid var(--green-200);
+      border-radius:100px;padding:4px 12px 4px 6px;
+      font-size:.82rem;font-weight:600;color:var(--green-700);
+    }
+    .admin-avatar{
+      width:24px;height:24px;background:var(--green-600);border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:.68rem;font-weight:800;
+    }
+    .btn-logout{
+      background:none;border:1.5px solid var(--gray-200);
+      border-radius:8px;padding:5px 12px;font-family:var(--font-b);
+      font-size:.82rem;font-weight:600;color:var(--gray-500);cursor:pointer;
+      transition:.2s;
+    }
+    .btn-logout:hover{border-color:#fca5a5;color:#b91c1c;background:#fef2f2}
+
+    /* ── LAYOUT ── */
+    .layout{display:flex;min-height:calc(100vh - 60px)}
+
+    .sidebar{
+      width:220px;flex-shrink:0;background:#fff;
+      border-right:1px solid var(--gray-200);
+      padding:20px 12px;display:flex;flex-direction:column;gap:4px;
+    }
+    .sidebar-label{
+      font-size:.68rem;font-weight:700;letter-spacing:.08em;
+      text-transform:uppercase;color:var(--gray-400);
+      padding:0 12px;margin:12px 0 6px;
+    }
+    .nav-item{
+      display:flex;align-items:center;gap:10px;
+      padding:9px 12px;border-radius:9px;
+      font-size:.875rem;font-weight:500;color:var(--gray-600);
+      cursor:pointer;border:none;background:none;width:100%;text-align:left;
+      transition:.18s;
+    }
+    .nav-item svg{width:16px;height:16px;flex-shrink:0}
+    .nav-item:hover{background:var(--green-50);color:var(--green-700)}
+    .nav-item.active{background:var(--green-100);color:var(--green-700);font-weight:600}
+
+    /* ── MAIN CONTENT ── */
+    .main{flex:1;padding:32px 28px;overflow-x:auto}
+
+    .page{display:none}
+    .page.active{display:block}
+
+    /* ── STATS GRID ── */
+    .stats-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:16px;margin-bottom:32px;
+    }
+    .stat-card{
+      background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);
+      padding:22px 20px;box-shadow:var(--shadow);
+    }
+    .stat-card .label{font-size:.75rem;font-weight:700;text-transform:uppercase;
+      letter-spacing:.07em;color:var(--gray-400);margin-bottom:8px}
+    .stat-card .value{font-family:var(--font-d);font-size:2rem;font-weight:800;
+      color:var(--gray-900);line-height:1}
+    .stat-card.green .value{color:var(--green-600)}
+    .stat-card .sub{font-size:.78rem;color:var(--gray-400);margin-top:4px}
+
+    /* ── SECTION HEADER ── */
+    .section-header{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:16px;flex-wrap:wrap;gap:10px;
+    }
+    .section-title{font-family:var(--font-d);font-size:1.1rem;font-weight:800;color:var(--gray-900)}
+    .section-count{
+      background:var(--green-100);color:var(--green-700);
+      font-size:.78rem;font-weight:700;padding:3px 10px;
+      border-radius:100px;
+    }
+    .btn-refresh{
+      display:flex;align-items:center;gap:6px;
+      background:var(--gray-100);border:none;border-radius:8px;
+      padding:7px 14px;font-family:var(--font-b);font-size:.82rem;
+      font-weight:600;color:var(--gray-600);cursor:pointer;transition:.2s;
+    }
+    .btn-refresh:hover{background:var(--gray-200)}
+    .btn-refresh svg{width:14px;height:14px}
+
+    /* ── SEARCH BAR ── */
+    .search-bar{
+      position:relative;margin-bottom:14px;max-width:340px;
+    }
+    .search-bar input{
+      width:100%;height:38px;padding:0 14px 0 36px;
+      font-family:var(--font-b);font-size:.85rem;
+      background:#fff;border:1.5px solid var(--gray-200);
+      border-radius:9px;outline:none;color:var(--gray-800);transition:.2s;
+    }
+    .search-bar input:focus{border-color:var(--green-400);box-shadow:0 0 0 3px rgba(74,222,128,.12)}
+    .search-bar svg{
+      position:absolute;left:10px;top:50%;transform:translateY(-50%);
+      width:15px;height:15px;color:var(--gray-400);pointer-events:none;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap{
+      background:#fff;border:1px solid var(--gray-200);
+      border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+      overflow-x:auto;
+    }
+    table{width:100%;border-collapse:collapse;min-width:600px}
+    thead th{
+      background:var(--gray-50);border-bottom:1px solid var(--gray-200);
+      padding:11px 16px;text-align:left;font-size:.75rem;font-weight:700;
+      text-transform:uppercase;letter-spacing:.07em;color:var(--gray-500);
+      white-space:nowrap;
+    }
+    tbody tr{border-bottom:1px solid var(--gray-100);transition:.15s}
+    tbody tr:last-child{border-bottom:none}
+    tbody tr:hover{background:var(--gray-50)}
+    td{padding:11px 16px;font-size:.85rem;color:var(--gray-700);white-space:nowrap}
+    td.mono{font-family:monospace;font-size:.8rem;color:var(--gray-500)}
+
+    .badge{
+      display:inline-flex;align-items:center;
+      padding:2px 9px;border-radius:100px;font-size:.72rem;font-weight:700;
+    }
+    .badge.active{background:var(--green-100);color:var(--green-700)}
+    .badge.inactive{background:#fee2e2;color:#b91c1c}
+
+    /* ── ACTION BUTTONS ── */
+    .action-btn{
+      background:none;border:none;cursor:pointer;
+      padding:5px 8px;border-radius:6px;font-size:.78rem;
+      font-family:var(--font-b);font-weight:600;transition:.18s;
+    }
+    .action-btn.deactivate{color:#b91c1c}
+    .action-btn.deactivate:hover{background:#fef2f2}
+    .action-btn.activate{color:var(--green-600)}
+    .action-btn.activate:hover{background:var(--green-50)}
+    .action-btn.delete{color:var(--gray-400)}
+    .action-btn.delete:hover{background:#fef2f2;color:#b91c1c}
+
+    /* ── TOP CROPS CHART (CSS bars) ── */
+    .crop-bars{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+    .crop-bar-row{display:flex;align-items:center;gap:12px}
+    .crop-bar-label{font-size:.82rem;font-weight:600;color:var(--gray-700);width:100px;flex-shrink:0;text-transform:capitalize}
+    .crop-bar-track{flex:1;height:8px;background:var(--gray-100);border-radius:100px;overflow:hidden}
+    .crop-bar-fill{height:100%;border-radius:100px;background:var(--green-500);transition:width 1s ease}
+    .crop-bar-count{font-size:.78rem;font-weight:600;color:var(--gray-400);width:32px;text-align:right;flex-shrink:0}
+
+    /* ── EMPTY STATE ── */
+    .empty-state{
+      text-align:center;padding:48px 20px;color:var(--gray-400);
+    }
+    .empty-state svg{width:40px;height:40px;margin:0 auto 12px;opacity:.4}
+    .empty-state p{font-size:.9rem}
+
+    /* ── LOADING ── */
+    .loading-spinner{
+      display:flex;align-items:center;justify-content:center;
+      gap:8px;padding:32px;color:var(--gray-400);font-size:.9rem;
+    }
+    .spin{animation:spin 1s linear infinite}
+    @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+    /* ── TOAST ── */
+    .toast{
+      position:fixed;bottom:24px;right:24px;z-index:9999;
+      background:var(--gray-900);color:#fff;
+      padding:12px 18px;border-radius:10px;
+      font-size:.85rem;font-weight:500;
+      box-shadow:0 8px 32px rgba(0,0,0,.2);
+      transform:translateY(80px);opacity:0;
+      transition:.3s cubic-bezier(.34,1.56,.64,1);
+      pointer-events:none;
+    }
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast.success{background:var(--green-700)}
+    .toast.error{background:#b91c1c}
+
+    @media(max-width:768px){
+      .sidebar{display:none}
+      .main{padding:20px 16px}
+      .stats-grid{grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================
+     LOGIN SCREEN
+============================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#16a34a"/>
+        <path d="M18 8C18 8 10 14 10 20C10 24.4 13.6 28 18 28C22.4 28 26 24.4 26 20C26 14 18 8 18 8Z" fill="white" opacity="0.9"/>
+        <path d="M18 14V28" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M18 20L14 16" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M18 22L22 18" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span>CropIQ</span>
+    </div>
+
+    <div class="login-title">Admin Dashboard</div>
+    <div class="login-sub">Sign in with your admin credentials to continue</div>
+
+    <div class="login-error" id="loginError">Invalid admin credentials.</div>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="adminEmail" placeholder="admin@cropiq.com"
+             onkeydown="if(event.key==='Enter') adminLogin()" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="adminPassword" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter') adminLogin()" />
+    </div>
+
+    <button class="btn-green" onclick="adminLogin()" id="loginBtn">
+      <svg viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px"><path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+      Sign In to Dashboard
+    </button>
+  </div>
+</div>
+
+<!-- ============================
+     DASHBOARD
+============================= -->
+<div id="dashboard">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="18" fill="#16a34a"/>
+        <path d="M18 8C18 8 10 14 10 20C10 24.4 13.6 28 18 28C22.4 28 26 24.4 26 20C26 14 18 8 18 8Z" fill="white" opacity="0.9"/>
+        <path d="M18 14V28" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M18 20L14 16" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M18 22L22 18" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span>CropIQ</span>
+      <small>Admin</small>
+    </div>
+    <div class="topbar-right">
+      <div class="admin-pill">
+        <div class="admin-avatar">A</div>
+        Admin
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-label">Navigation</div>
+      <button class="nav-item active" id="nav-overview" onclick="showPage('overview')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>
+        Overview
+      </button>
+      <button class="nav-item" id="nav-users" onclick="showPage('users')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        Users
+      </button>
+      <button class="nav-item" id="nav-predictions" onclick="showPage('predictions')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg>
+        Predictions
+      </button>
+    </div>
+
+    <!-- Main content -->
+    <div class="main">
+
+      <!-- ── OVERVIEW PAGE ── -->
+      <div class="page active" id="page-overview">
+        <div class="stats-grid" id="statsGrid">
+          <div class="loading-spinner" style="grid-column:1/-1">
+            <svg class="spin" viewBox="0 0 24 24" fill="none" style="width:20px;height:20px">
+              <circle cx="12" cy="12" r="10" stroke="#9ca3af" stroke-width="3" stroke-dasharray="30 70"/>
+            </svg>
+            Loading stats...
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap" id="overviewBottom">
+          <!-- Top crops card -->
+          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)">
+            <div class="section-title" style="margin-bottom:16px">Top Recommended Crops</div>
+            <div id="topCropsBars">
+              <div class="loading-spinner">Loading...</div>
+            </div>
+          </div>
+          <!-- Quick info -->
+          <div style="background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)">
+            <div class="section-title" style="margin-bottom:16px">Quick Info</div>
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:.875rem">
+              <div style="display:flex;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--gray-100)">
+                <span style="color:var(--gray-500)">Database</span>
+                <span style="font-weight:600;color:var(--green-600)">SQLite ✓</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--gray-100)">
+                <span style="color:var(--gray-500)">Password hashing</span>
+                <span style="font-weight:600">bcrypt</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--gray-100)">
+                <span style="color:var(--gray-500)">Auth method</span>
+                <span style="font-weight:600">JWT (24h)</span>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <span style="color:var(--gray-500)">ML Model</span>
+                <span style="font-weight:600">Random Forest</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── USERS PAGE ── -->
+      <div class="page" id="page-users">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="section-title">Registered Users</div>
+            <span class="section-count" id="userCount">—</span>
+          </div>
+          <button class="btn-refresh" onclick="loadUsers()">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="search-bar">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+          <input type="text" id="userSearch" placeholder="Search by name or email..."
+                 oninput="filterUsers()" />
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Registered</th>
+                <th>Last Login</th>
+                <th>Logins</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable">
+              <tr><td colspan="8">
+                <div class="loading-spinner">
+                  <svg class="spin" viewBox="0 0 24 24" fill="none" style="width:18px;height:18px">
+                    <circle cx="12" cy="12" r="10" stroke="#9ca3af" stroke-width="3" stroke-dasharray="30 70"/>
+                  </svg>
+                  Loading users...
+                </div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── PREDICTIONS PAGE ── -->
+      <div class="page" id="page-predictions">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="section-title">Prediction Logs</div>
+            <span class="section-count" id="predCount">—</span>
+          </div>
+          <button class="btn-refresh" onclick="loadPredictions()">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="search-bar">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+          <input type="text" id="predSearch" placeholder="Search by email or crop..."
+                 oninput="filterPredictions()" />
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>User Email</th>
+                <th>Top Crop</th>
+                <th>Confidence</th>
+                <th>N / P / K</th>
+                <th>Temp / Hum</th>
+                <th>pH / Rain</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="predsTable">
+              <tr><td colspan="8">
+                <div class="loading-spinner">
+                  <svg class="spin" viewBox="0 0 24 24" fill="none" style="width:18px;height:18px">
+                    <circle cx="12" cy="12" r="10" stroke="#9ca3af" stroke-width="3" stroke-dasharray="30 70"/>
+                  </svg>
+                  Loading predictions...
+                </div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+</div><!-- /dashboard -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────
+// CONFIG — change this to your Render URL
+// ─────────────────────────────────────────
+const API = "";   // empty = same origin (served from FastAPI)
+                  // if separate: "https://smart-crop-advisory-system-2.onrender.com"
+
+let adminToken  = localStorage.getItem('cropiq_admin_token') || "";
+let allUsers    = [];
+let allPreds    = [];
+
+// ─────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────
+function showToast(msg, type = "success") {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─────────────────────────────────────────
+// ADMIN LOGIN
+// ─────────────────────────────────────────
+async function adminLogin() {
+  const email    = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value;
+  const errEl    = document.getElementById('loginError');
+  const btn      = document.getElementById('loginBtn');
+
+  errEl.style.display = 'none';
+  btn.textContent = 'Signing in...';
+  btn.disabled = true;
+
+  try {
+    const res  = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.is_admin) {
+      errEl.textContent = data.detail || "Invalid admin credentials.";
+      errEl.style.display = 'block';
+      return;
+    }
+
+    adminToken = data.token;
+    localStorage.setItem('cropiq_admin_token', adminToken);
+
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadOverview();
+
+  } catch (err) {
+    errEl.textContent = "Connection error. Is the server running?";
+    errEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Sign In to Dashboard';
+    btn.disabled = false;
+  }
+}
+
+// Auto-login if token exists
+window.addEventListener('DOMContentLoaded', () => {
+  if (adminToken) {
+    // Verify token is still valid by fetching stats
+    fetch(`${API}/admin/stats`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    }).then(r => {
+      if (r.ok) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadOverview();
+      } else {
+        localStorage.removeItem('cropiq_admin_token');
+        adminToken = "";
+      }
+    }).catch(() => {});
+  }
+});
+
+function logout() {
+  localStorage.removeItem('cropiq_admin_token');
+  adminToken = "";
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+// ─────────────────────────────────────────
+// PAGE NAVIGATION
+// ─────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  document.getElementById(`nav-${name}`).classList.add('active');
+
+  if (name === 'overview')    loadOverview();
+  if (name === 'users')       loadUsers();
+  if (name === 'predictions') loadPredictions();
+}
+
+// ─────────────────────────────────────────
+// OVERVIEW
+// ─────────────────────────────────────────
+async function loadOverview() {
+  try {
+    const res  = await fetch(`${API}/admin/stats`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+
+    renderStats(data);
+    renderTopCrops(data.top_crops);
+  } catch (err) {
+    showToast("Failed to load stats: " + err.message, "error");
+  }
+}
+
+function renderStats(d) {
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card green">
+      <div class="label">Total Users</div>
+      <div class="value">${d.total_users}</div>
+      <div class="sub">${d.active_users} active</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Total Predictions</div>
+      <div class="value">${d.total_predictions}</div>
+      <div class="sub">${d.predictions_today} today</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">New Users Today</div>
+      <div class="value">${d.new_users_today}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Predictions Today</div>
+      <div class="value">${d.predictions_today}</div>
+    </div>
+  `;
+}
+
+function renderTopCrops(crops) {
+  if (!crops || crops.length === 0) {
+    document.getElementById('topCropsBars').innerHTML =
+      '<p style="color:var(--gray-400);font-size:.85rem">No predictions yet.</p>';
+    return;
+  }
+  const max = crops[0].count;
+  document.getElementById('topCropsBars').innerHTML = `
+    <div class="crop-bars">
+      ${crops.map(c => `
+        <div class="crop-bar-row">
+          <div class="crop-bar-label">${c.top_crop}</div>
+          <div class="crop-bar-track">
+            <div class="crop-bar-fill" style="width:${Math.round((c.count/max)*100)}%"></div>
+          </div>
+          <div class="crop-bar-count">${c.count}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────
+// USERS
+// ─────────────────────────────────────────
+async function loadUsers() {
+  document.getElementById('usersTable').innerHTML = `
+    <tr><td colspan="8"><div class="loading-spinner">
+      <svg class="spin" viewBox="0 0 24 24" fill="none" style="width:18px;height:18px">
+        <circle cx="12" cy="12" r="10" stroke="#9ca3af" stroke-width="3" stroke-dasharray="30 70"/>
+      </svg>Loading...</div></td></tr>`;
+
+  try {
+    const res  = await fetch(`${API}/admin/users`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+
+    allUsers = data.users;
+    document.getElementById('userCount').textContent = data.total;
+    renderUsers(allUsers);
+  } catch (err) {
+    showToast("Failed to load users: " + err.message, "error");
+  }
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('usersTable');
+  if (users.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8">
+      <div class="empty-state">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+        <p>No users registered yet.</p>
+      </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => `
+    <tr id="user-row-${u.id}">
+      <td class="mono">#${u.id}</td>
+      <td style="font-weight:600">${esc(u.name)}</td>
+      <td class="mono">${esc(u.email)}</td>
+      <td class="mono">${fmtDate(u.created_at)}</td>
+      <td class="mono">${u.last_login ? fmtDate(u.last_login) : '—'}</td>
+      <td style="text-align:center">${u.login_count}</td>
+      <td>
+        <span class="badge ${u.is_active ? 'active' : 'inactive'}">
+          ${u.is_active ? 'Active' : 'Inactive'}
+        </span>
+      </td>
+      <td>
+        ${u.is_active
+          ? `<button class="action-btn deactivate" onclick="deactivateUser(${u.id})">Deactivate</button>`
+          : `<button class="action-btn activate"   onclick="activateUser(${u.id})">Activate</button>`
+        }
+        <button class="action-btn delete" onclick="deleteUser(${u.id}, '${esc(u.name)}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterUsers() {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  renderUsers(allUsers.filter(u =>
+    u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+  ));
+}
+
+async function deactivateUser(id) {
+  if (!confirm('Deactivate this user?')) return;
+  try {
+    await fetch(`${API}/admin/users/${id}/deactivate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    showToast('User deactivated');
+    loadUsers();
+  } catch { showToast('Failed', 'error'); }
+}
+
+async function activateUser(id) {
+  try {
+    await fetch(`${API}/admin/users/${id}/activate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    showToast('User activated');
+    loadUsers();
+  } catch { showToast('Failed', 'error'); }
+}
+
+async function deleteUser(id, name) {
+  if (!confirm(`Permanently delete user "${name}"? This cannot be undone.`)) return;
+  try {
+    await fetch(`${API}/admin/users/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    showToast(`User "${name}" deleted`);
+    loadUsers();
+  } catch { showToast('Failed', 'error'); }
+}
+
+// ─────────────────────────────────────────
+// PREDICTIONS
+// ─────────────────────────────────────────
+async function loadPredictions() {
+  document.getElementById('predsTable').innerHTML = `
+    <tr><td colspan="8"><div class="loading-spinner">
+      <svg class="spin" viewBox="0 0 24 24" fill="none" style="width:18px;height:18px">
+        <circle cx="12" cy="12" r="10" stroke="#9ca3af" stroke-width="3" stroke-dasharray="30 70"/>
+      </svg>Loading...</div></td></tr>`;
+
+  try {
+    const res  = await fetch(`${API}/admin/predictions`, {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+
+    allPreds = data.predictions;
+    document.getElementById('predCount').textContent = data.total;
+    renderPredictions(allPreds);
+  } catch (err) {
+    showToast("Failed to load predictions: " + err.message, "error");
+  }
+}
+
+function renderPredictions(preds) {
+  const tbody = document.getElementById('predsTable');
+  if (preds.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8">
+      <div class="empty-state">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 00-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"/></svg>
+        <p>No predictions logged yet.</p>
+      </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = preds.map(p => `
+    <tr>
+      <td class="mono">#${p.id}</td>
+      <td class="mono">${esc(p.user_email || '—')}</td>
+      <td style="font-weight:700;text-transform:capitalize;color:var(--green-700)">${esc(p.top_crop)}</td>
+      <td>${p.confidence != null ? (p.confidence*100).toFixed(1)+'%' : '—'}</td>
+      <td class="mono">${p.N}/${p.P}/${p.K}</td>
+      <td class="mono">${p.temperature}°/${p.humidity}%</td>
+      <td class="mono">${p.ph} / ${p.rainfall}mm</td>
+      <td class="mono">${fmtDate(p.created_at)}</td>
+    </tr>
+  `).join('');
+}
+
+function filterPredictions() {
+  const q = document.getElementById('predSearch').value.toLowerCase();
+  renderPredictions(allPreds.filter(p =>
+    (p.user_email || '').toLowerCase().includes(q) ||
+    (p.top_crop || '').toLowerCase().includes(q)
+  ));
+}
+
+// ─────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d + 'Z').toLocaleString('en-IN', {
+    day:'2-digit', month:'short', year:'2-digit',
+    hour:'2-digit', minute:'2-digit'
+  });
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

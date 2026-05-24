@@ -1,11 +1,37 @@
 /**
- * Smart Crop Advisory System — script.js (IMPROVED)
+ * Smart Crop Advisory System — script.js  (v2 — JWT Auth)
+ *
+ * Changes from v1:
+ *  • Every API call now sends Authorization: Bearer <token>
+ *  • If backend returns 401, user is redirected to login
+ *  • getAuthHeaders() helper centralises token injection
  */
 
 // =======================
 // 🔗 API BASE URL
 // =======================
 const API_URL = "https://smart-crop-advisory-system-2.onrender.com";
+
+// =======================
+// 🔑 AUTH HEADER HELPER
+// =======================
+function getAuthHeaders() {
+  const token = localStorage.getItem('cropiq_token') || '';
+  return {
+    'Content-Type':  'application/json',
+    'Authorization': `Bearer ${token}`
+  };
+}
+
+function handleAuthError(status) {
+  if (status === 401) {
+    // Token expired or invalid → back to login
+    localStorage.removeItem('cropiq_token');
+    localStorage.removeItem('cropiq_name');
+    localStorage.removeItem('cropiq_email');
+    window.location.href = 'login.html';
+  }
+}
 
 // =======================
 // NAVBAR
@@ -18,7 +44,7 @@ window.addEventListener('scroll', () => {
 // =======================
 // HAMBURGER MENU
 // =======================
-const hamburger = document.getElementById('hamburger');
+const hamburger  = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
 
 hamburger.addEventListener('click', () => {
@@ -41,7 +67,7 @@ async function fetchWithRetry(url, options, retries = 6, delay = 6000) {
   for (let i = 0; i < retries; i++) {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
+      const timeout    = setTimeout(() => controller.abort(), 15000);
 
       const response = await fetch(url, {
         ...options,
@@ -50,11 +76,18 @@ async function fetchWithRetry(url, options, retries = 6, delay = 6000) {
 
       clearTimeout(timeout);
 
+      // Handle auth error — don't retry, redirect immediately
+      if (response.status === 401) {
+        handleAuthError(401);
+        throw new Error('Session expired. Redirecting to login...');
+      }
+
       return response;
 
     } catch (err) {
-      console.log(`Retry ${i + 1}...`);
+      if (err.message.includes('Session expired')) throw err;
 
+      console.log(`Retry ${i + 1}...`);
       if (i < retries - 1) {
         await new Promise(res => setTimeout(res, delay));
       } else {
@@ -69,7 +102,7 @@ async function fetchWithRetry(url, options, retries = 6, delay = 6000) {
 // =======================
 async function handlePredict() {
   const btn = document.getElementById('predictBtn');
-  if (btn.disabled) return; // prevent spam click
+  if (btn.disabled) return;
 
   const n    = parseFloat(document.getElementById('nitrogen').value);
   const p    = parseFloat(document.getElementById('phosphorus').value);
@@ -91,23 +124,22 @@ async function handlePredict() {
     const response = await fetchWithRetry(
       `${API_URL}/predict`,
       {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method:  'POST',
+        headers: getAuthHeaders(),           // ← JWT token injected here
         body: JSON.stringify({
           N: n, P: p, K: k,
           temperature: temp,
-          humidity: hum,
-          ph: ph,
-          rainfall: rain
+          humidity:    hum,
+          ph:          ph,
+          rainfall:    rain
         })
       }
     );
 
     const data = await response.json();
 
-    // 🔥 HANDLE SERVER ERRORS
     if (!response.ok) {
-      throw new Error(data?.detail || "Server error");
+      throw new Error(data?.detail || 'Server error');
     }
 
     const predictions = normalizePredictions(data);
@@ -121,12 +153,14 @@ async function handlePredict() {
   } catch (err) {
     console.error(err);
 
-    if (err.name === "AbortError") {
-      showError("Server taking too long... please retry.");
-    } else if (err.message.includes("Failed to fetch")) {
-      showError("⏳ Server is starting... please wait (first request may take ~30s)");
+    if (err.message.includes('Session expired')) {
+      showError('Session expired. Redirecting to login...');
+    } else if (err.name === 'AbortError') {
+      showError('Server taking too long... please retry.');
+    } else if (err.message.includes('Failed to fetch')) {
+      showError('⏳ Server is starting... please wait (first request may take ~30s)');
     } else {
-      showError(err.message || "Something went wrong.");
+      showError(err.message || 'Something went wrong.');
     }
 
   } finally {
@@ -157,13 +191,13 @@ function handleReset() {
 function normalizePredictions(data) {
   if (data?.top_predictions && data.top_predictions.length > 0) {
     return data.top_predictions.map(item => ({
-      crop: String(item.crop).toUpperCase(),
+      crop:       String(item.crop).toUpperCase(),
       confidence: item.confidence
     }));
   }
   if (data?.recommended_crop) {
     return [{
-      crop: String(data.recommended_crop).toUpperCase(),
+      crop:       String(data.recommended_crop).toUpperCase(),
       confidence: 1
     }];
   }
@@ -186,9 +220,11 @@ function renderCards(predictions) {
   const grid = document.getElementById('predictionGrid');
   grid.innerHTML = '';
 
+  const rankClass = ['rank-1', 'rank-2', 'rank-3'];
+
   predictions.forEach((item, index) => {
     const card = document.createElement('div');
-    card.className = 'pred-card';
+    card.className = `pred-card ${rankClass[index] || ''}`;
 
     card.innerHTML = `
       <h3>#${index + 1} ${item.crop}</h3>
@@ -212,10 +248,10 @@ function renderChart(predictions) {
     data: {
       labels: predictions.map(p => p.crop),
       datasets: [{
-  label: 'Match %',
-  data: predictions.map(p => Math.round(p.confidence * 100)),
-  backgroundColor: ['#2e7d32', '#66bb6a', '#a5d6a7'],
-}]
+        label:           'Match %',
+        data:            predictions.map(p => Math.round(p.confidence * 100)),
+        backgroundColor: ['#2e7d32', '#66bb6a', '#a5d6a7'],
+      }]
     }
   });
 }
@@ -225,13 +261,12 @@ function renderChart(predictions) {
 // =======================
 function setLoading(isLoading) {
   const btn = document.getElementById('predictBtn');
-
   if (isLoading) {
-    btn.innerText = "Waking server... ⏳";
-    btn.disabled = true;
+    btn.innerText = 'Waking server... ⏳';
+    btn.disabled  = true;
   } else {
-    btn.innerText = "Predict";
-    btn.disabled = false;
+    btn.innerText = 'Predict';
+    btn.disabled  = false;
   }
 }
 
@@ -243,5 +278,5 @@ function showError(msg) {
 }
 
 function hideError() {
-  document.getElementById('errorMessage').innerText = "";
+  document.getElementById('errorMessage').innerText = '';
 }

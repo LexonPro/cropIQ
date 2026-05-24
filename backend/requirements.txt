@@ -4,3 +4,6 @@ joblib
 numpy
 scikit-learn==1.5.2
 pydantic
+passlib[bcrypt]
+python-jose[cryptography]
+python-multipart
