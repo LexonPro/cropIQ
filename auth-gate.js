@@ -126,3 +126,11 @@ function updateMobileMenu(name) {
   logoutLink.onclick = handleLogout;
   mobileMenu.appendChild(logoutLink);
 }
+
+// =======================
+// ⏳ PRE-EMPTIVE WAKE UP PING
+// =======================
+(function wakeBackend() {
+  const API_URL = "https://smart-crop-advisory-system-2.onrender.com";
+  fetch(`${API_URL}/health`).catch(() => {});
+})();

@@ -370,3 +370,11 @@ async function handleForgot() {
     window.location.href = 'index.html';
   }
 })();
+
+// =======================
+// ⏳ PRE-EMPTIVE WAKE UP PING
+// =======================
+(function wakeBackend() {
+  const API_URL = "https://smart-crop-advisory-system-2.onrender.com";
+  fetch(`${API_URL}/health`).catch(() => {});
+})();
