@@ -296,6 +296,147 @@ def get_me(current_user: dict = Depends(get_current_user)):
     }
 
 # =========================
+# 🌾 OPTIMAL CROP TARGETS FOR ADVISORY
+# =========================
+CROP_TARGETS = {
+    "rice":         {"N": 80,  "P": 40, "K": 40, "ph": 6.5, "name": "Rice"},
+    "maize":        {"N": 100, "P": 50, "K": 30, "ph": 6.2, "name": "Maize"},
+    "chickpea":     {"N": 40,  "P": 60, "K": 80, "ph": 7.0, "name": "Chickpea"},
+    "kidneybeans":  {"N": 20,  "P": 60, "K": 20, "ph": 6.0, "name": "Kidney Beans"},
+    "pigeonpeas":   {"N": 20,  "P": 68, "K": 20, "ph": 6.5, "name": "Pigeon Peas"},
+    "mothbeans":    {"N": 20,  "P": 40, "K": 20, "ph": 6.8, "name": "Moth Beans"},
+    "mungbean":     {"N": 20,  "P": 40, "K": 20, "ph": 6.7, "name": "Mung Bean"},
+    "blackgram":    {"N": 40,  "P": 60, "K": 20, "ph": 7.0, "name": "Black Gram"},
+    "lentil":       {"N": 20,  "P": 60, "K": 20, "ph": 6.8, "name": "Lentil"},
+    "pomegranate":  {"N": 20,  "P": 10, "K": 40, "ph": 6.4, "name": "Pomegranate"},
+    "banana":       {"N": 100, "P": 82, "K": 50, "ph": 6.0, "name": "Banana"},
+    "mango":        {"N": 20,  "P": 28, "K": 30, "ph": 5.8, "name": "Mango"},
+    "grapes":       {"N": 24,  "P": 122,"K": 200,"ph": 6.0, "name": "Grapes"},
+    "watermelon":   {"N": 80,  "P": 24, "K": 50, "ph": 6.5, "name": "Watermelon"},
+    "muskmelon":    {"N": 100, "P": 18, "K": 50, "ph": 6.3, "name": "Muskmelon"},
+    "apple":        {"N": 20,  "P": 125,"K": 200,"ph": 5.9, "name": "Apple"},
+    "orange":       {"N": 20,  "P": 10, "K": 10, "ph": 7.0, "name": "Orange"},
+    "papaya":       {"N": 50,  "P": 50, "K": 50, "ph": 6.5, "name": "Papaya"},
+    "coconut":      {"N": 20,  "P": 10, "K": 30, "ph": 6.0, "name": "Coconut"},
+    "cotton":       {"N": 120, "P": 60, "K": 20, "ph": 7.0, "name": "Cotton"},
+    "jute":         {"N": 80,  "P": 40, "K": 40, "ph": 6.7, "name": "Jute"},
+    "coffee":       {"N": 100, "P": 30, "K": 30, "ph": 5.8, "name": "Coffee"}
+}
+
+def generate_advisory(crop_key: str, actual_n: float, actual_p: float, actual_k: float, actual_ph: float):
+    crop_key = crop_key.lower().strip()
+    target = CROP_TARGETS.get(crop_key, {"N": 50, "P": 50, "K": 50, "ph": 6.5, "name": crop_key.capitalize()})
+    
+    advice = []
+    
+    # Nitrogen logic
+    diff_n = target["N"] - actual_n
+    if diff_n > 10:
+        urea_needed = round(diff_n * 2.17, 1)
+        advice.append({
+            "nutrient": "Nitrogen (N)", 
+            "status": "deficient", 
+            "diff": round(diff_n, 1),
+            "message": f"Deficient by {round(diff_n, 1)} mg/kg. Apply ~{urea_needed} kg/acre of Urea fertilizer to replenish Nitrogen levels."
+        })
+    elif diff_n < -30:
+        advice.append({
+            "nutrient": "Nitrogen (N)", 
+            "status": "excess", 
+            "diff": round(diff_n, 1),
+            "message": f"Excessive by {round(abs(diff_n), 1)} mg/kg. Pause Nitrogen-heavy additions. Flush soil with balanced watering."
+        })
+    else:
+        advice.append({
+            "nutrient": "Nitrogen (N)", 
+            "status": "optimal", 
+            "diff": round(diff_n, 1),
+            "message": "Optimal range. Soil Nitrogen is well-balanced for this crop."
+        })
+
+    # Phosphorus logic
+    diff_p = target["P"] - actual_p
+    if diff_p > 10:
+        dap_needed = round(diff_p * 2.17, 1)
+        advice.append({
+            "nutrient": "Phosphorus (P)", 
+            "status": "deficient", 
+            "diff": round(diff_p, 1),
+            "message": f"Deficient by {round(diff_p, 1)} mg/kg. Apply ~{dap_needed} kg/acre of DAP (Diammonium Phosphate) before sowing."
+        })
+    elif diff_p < -30:
+        advice.append({
+            "nutrient": "Phosphorus (P)", 
+            "status": "excess", 
+            "diff": round(diff_p, 1),
+            "message": f"Excessive by {round(abs(diff_p), 1)} mg/kg. High Phosphorus can inhibit iron and zinc absorption. Avoid phosphate additions."
+        })
+    else:
+        advice.append({
+            "nutrient": "Phosphorus (P)", 
+            "status": "optimal", 
+            "diff": round(diff_p, 1),
+            "message": "Optimal range. Soil Phosphorus is ideal."
+        })
+
+    # Potassium logic
+    diff_k = target["K"] - actual_k
+    if diff_k > 10:
+        mop_needed = round(diff_k * 1.67, 1)
+        advice.append({
+            "nutrient": "Potassium (K)", 
+            "status": "deficient", 
+            "diff": round(diff_k, 1),
+            "message": f"Deficient by {round(diff_k, 1)} mg/kg. Add ~{mop_needed} kg/acre of Muriate of Potash (MOP) to boost crop immunity and yield."
+        })
+    elif diff_k < -30:
+        advice.append({
+            "nutrient": "Potassium (K)", 
+            "status": "excess", 
+            "diff": round(diff_k, 1),
+            "message": f"Excessive by {round(abs(diff_k), 1)} mg/kg. Excessive Potassium can block Magnesium uptake. Reduce potash additions."
+        })
+    else:
+        advice.append({
+            "nutrient": "Potassium (K)", 
+            "status": "optimal", 
+            "diff": round(diff_k, 1),
+            "message": "Optimal range. Soil Potassium is well-balanced."
+        })
+
+    # pH logic
+    diff_ph = target["ph"] - actual_ph
+    if actual_ph < 5.5:
+        lime_needed = round((5.5 - actual_ph) * 500, 0)
+        advice.append({
+            "nutrient": "Soil pH", 
+            "status": "acidic", 
+            "diff": round(diff_ph, 2),
+            "message": f"Soil is acidic (pH {actual_ph}). Broadcast ~{lime_needed} kg/acre of Agricultural Lime (Calcium Carbonate) to raise pH to target {target['ph']}."
+        })
+    elif actual_ph > 7.5:
+        sulfur_needed = round((actual_ph - 7.5) * 150, 0)
+        advice.append({
+            "nutrient": "Soil pH", 
+            "status": "alkaline", 
+            "diff": round(diff_ph, 2),
+            "message": f"Soil is alkaline (pH {actual_ph}). Apply ~{sulfur_needed} kg/acre of Agricultural elemental Sulfur or Gypsum to lower pH to target {target['ph']}."
+        })
+    else:
+        advice.append({
+            "nutrient": "Soil pH", 
+            "status": "optimal", 
+            "diff": round(diff_ph, 2),
+            "message": f"Optimal pH level ({actual_ph}) for nutrient availability in {target['name']} crops."
+        })
+
+    return {
+        "crop_name": target["name"],
+        "targets": target,
+        "advice": advice
+    }
+
+# =========================
 # 🌾 PREDICT (protected)
 # =========================
 @app.post("/predict")
@@ -327,6 +468,9 @@ def predict(data: CropInput, current_user: dict = Depends(get_current_user)):
         except Exception:
             top3 = [{"crop": str(prediction), "confidence": 1.0}]
 
+        # Compute Agronomic Advisory Targets
+        advisory = generate_advisory(top3[0]["crop"] if top3 else prediction, data.N, data.P, data.K, data.ph)
+
         # ── Log prediction to DB ─────────────────
         try:
             conn = get_db()
@@ -348,7 +492,7 @@ def predict(data: CropInput, current_user: dict = Depends(get_current_user)):
         except Exception as log_err:
             print("⚠️ Log error (non-fatal):", log_err)
 
-        return {"top_predictions": top3, "status": "success"}
+        return {"top_predictions": top3, "advisory": advisory, "status": "success"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

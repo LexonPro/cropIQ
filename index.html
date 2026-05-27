@@ -131,7 +131,58 @@
       <h2 class="section-title">Enter Soil & Climate Data</h2>
       <p class="section-sub">Provide your soil nutrient levels and current climate conditions for accurate crop recommendations.</p>
 
-      <div class="form-card" id="formCard">
+      <style>
+        @keyframes scanSweeper {
+          0% { top: 0%; }
+          50% { top: 100%; }
+          100% { top: 0%; }
+        }
+        .field-pulse {
+          animation: inputPulse 0.4s ease 2;
+        }
+        @keyframes inputPulse {
+          0%, 100% { border-color: var(--gray-200); box-shadow: none; }
+          50% { border-color: var(--green-500); box-shadow: 0 0 8px rgba(34,197,94,0.2); }
+        }
+      </style>
+
+      <div class="form-card" id="formCard" style="position:relative;">
+        
+        <!-- Scanner Overlay -->
+        <div class="scanner-overlay" id="scannerOverlay" style="display:none; position:absolute; inset:0; background:rgba(22,163,74,0.04); z-index:10; pointer-events:none; border-radius:var(--radius-xl); overflow:hidden;">
+          <div class="scanner-line" style="width:100%; height:4px; background:linear-gradient(to right, transparent, var(--green-500), transparent); box-shadow:0 0 12px var(--green-500); position:absolute; top:0; animation:scanSweeper 2s linear infinite;"></div>
+        </div>
+
+        <!-- IoT Probe & GPS weather Panel -->
+        <div class="iot-probe-controller" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid var(--gray-200);">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px; background:var(--green-50); color:var(--green-600); flex-shrink:0;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px; height:20px; stroke-linecap:round; stroke-linejoin:round;"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </span>
+            <div>
+              <h4 style="font-family:var(--font-display); font-weight:700; font-size:0.95rem; color:var(--gray-900);">Hardware IoT Soil Probe & Weather Panel</h4>
+              <p style="font-size:0.75rem; color:var(--gray-400);">Simulate chemical sensors or fetch active meteorological forecasts</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <button class="btn-reset" id="weatherBtn" onclick="handleWeatherDetect()" style="height:36px; padding:0 12px; font-size:0.82rem; border-radius:8px; display:inline-flex; align-items:center; gap:6px; margin:0; border:1.5px solid var(--gray-200); color:var(--gray-700); background:#fff; font-weight:600; cursor:pointer; transition:0.2s;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; stroke-linecap:round; stroke-linejoin:round;"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
+              GPS Weather
+            </button>
+            <span style="color:var(--gray-300);">|</span>
+            <select id="soilPreset" style="height:36px; padding:0 12px; border-radius:8px; border:1.5px solid var(--gray-200); background:var(--gray-50); font-family:var(--font-body); font-size:0.82rem; color:var(--gray-700); outline:none; cursor:pointer; transition:border-color var(--transition);">
+              <option value="balanced">Balanced Loamy Soil</option>
+              <option value="acidic_dry">Acidic Arid Soil</option>
+              <option value="nitrogen_deficient">Nitrogen Deficient Clay</option>
+              <option value="alkaline_potash">Alkaline Volcanic Soil</option>
+            </select>
+            <button class="btn-predict" id="probeBtn" onclick="handleProbeSimulate()" style="height:36px; padding:0 16px; font-size:0.82rem; border-radius:8px; display:inline-flex; align-items:center; gap:6px; box-shadow:none; margin:0; font-weight:600; cursor:pointer;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; stroke-linecap:round; stroke-linejoin:round;"><circle cx="12" cy="12" r="10"/><path d="m16 12-4-4-4 4"/></svg>
+              Scan Probe
+            </button>
+          </div>
+        </div>
+
         <div class="form-grid">
 
           <!-- N -->
@@ -275,6 +326,17 @@
       <!-- Prediction Cards -->
       <div class="prediction-grid" id="predictionGrid">
         <!-- Injected by JS -->
+      </div>
+
+      <!-- NPK Target Prescription Cards -->
+      <div class="advisory-card-wrap" id="advisoryWrap" style="display:none; margin-top:40px; margin-bottom:40px;">
+        <div class="section-label">Step 03 — Agronomical Prescriptions</div>
+        <h2 class="section-title">AI Soil Diagnostics & Prescription Advisory</h2>
+        <p class="section-sub">Computed balanced mineral target thresholds and calculated customized fertilizer recipe cards for optimal growth.</p>
+        
+        <div class="advisory-grid" id="advisoryGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:24px; margin-top:20px;">
+          <!-- Injected dynamically by JS -->
+        </div>
       </div>
 
       <!-- Chart -->
