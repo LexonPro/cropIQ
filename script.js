@@ -104,6 +104,11 @@ async function handlePredict() {
   const btn = document.getElementById('predictBtn');
   if (btn.disabled) return;
 
+  if (!isLoggedIn()) {
+    showLoginModal();
+    return;
+  }
+
   const n    = parseFloat(document.getElementById('nitrogen').value);
   const p    = parseFloat(document.getElementById('phosphorus').value);
   const k    = parseFloat(document.getElementById('potassium').value);
@@ -279,4 +284,24 @@ function showError(msg) {
 
 function hideError() {
   document.getElementById('errorMessage').innerText = '';
+}
+
+// =======================
+// 🔑 LOGIN MODAL HELPERS
+// =======================
+function showLoginModal() {
+  const modal = document.getElementById('loginRequiredModal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeLoginRequiredModal() {
+  const modal = document.getElementById('loginRequiredModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function closeLoginModalOnOverlay(e) {
+  const modal = document.getElementById('loginRequiredModal');
+  if (modal && e.target === modal) {
+    closeLoginRequiredModal();
+  }
 }
