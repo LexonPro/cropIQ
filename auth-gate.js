@@ -34,39 +34,58 @@ function handleLogout() {
 }
 
 // =======================
+// =======================
 // 🔒 AUTH GATE
 // =======================
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   if (!isLoggedIn()) {
-    showSignInBtnInNavbar();
-  } else {
-    showUserInNavbar();
+    await silentGuestLogin();
   }
+  showUserInNavbar();
 });
 
 // =======================
-// 🔑 SHOW SIGN IN IN NAVBAR
+// 🔑 SILENT GUEST LOGIN
 // =======================
-function showSignInBtnInNavbar() {
-  const navLinks = document.querySelector('.nav-links');
-  if (!navLinks) return;
+async function silentGuestLogin() {
+  const API_URL = "https://smart-crop-advisory-system-2.onrender.com";
+  const guestEmail = "guest@cropiq.com";
+  const guestPassword = "guest-secure-pass-123";
+  const guestName = "Guest Farmer";
 
-  const cta = navLinks.querySelector('.nav-cta');
-  if (cta) {
-    cta.textContent = 'Sign In';
-    cta.href = 'login.html';
-    cta.removeAttribute('target');
-  }
+  try {
+    // 1. Try to login
+    let res = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: guestEmail, password: guestPassword })
+    });
 
-  // Update mobile menu
-  const mobileMenu = document.getElementById('mobileMenu');
-  if (mobileMenu) {
-    const gh = mobileMenu.querySelector('a[target="_blank"]');
-    if (gh) {
-      gh.textContent = 'Sign In';
-      gh.href = 'login.html';
-      gh.removeAttribute('target');
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem(SESSION_KEY, data.token);
+      localStorage.setItem(NAME_KEY, data.name);
+      localStorage.setItem(EMAIL_KEY, data.email);
+      localStorage.setItem('cropiq_is_admin', 'false');
+      return;
     }
+
+    // 2. If login failed, register the guest user
+    res = await fetch(`${API_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: guestName, email: guestEmail, password: guestPassword })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      localStorage.setItem(SESSION_KEY, data.token);
+      localStorage.setItem(NAME_KEY, data.name);
+      localStorage.setItem(EMAIL_KEY, data.email);
+      localStorage.setItem('cropiq_is_admin', 'false');
+    }
+  } catch (err) {
+    console.error("Silent guest login warning:", err);
   }
 }
 
@@ -74,6 +93,12 @@ function showSignInBtnInNavbar() {
 // 👤 USER PILL IN NAVBAR
 // =======================
 function showUserInNavbar() {
+  const email = getEmail();
+  if (email === 'guest@cropiq.com') {
+    // Keep it clean for guests (don't display user pills or logouts)
+    return;
+  }
+
   const name     = getName();
   const navLinks = document.querySelector('.nav-links');
   if (!navLinks) return;
