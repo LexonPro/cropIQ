@@ -523,3 +523,209 @@ function renderAdvisory(advisory) {
     grid.appendChild(card);
   });
 }
+
+// =======================
+// 🗺️ INDIA WATERMARK MAP & STATE CULTURE lookup
+// =======================
+const STATE_CULTURES = {
+  "punjab": {
+    "dance": "Bhangra & Gidha",
+    "festival": "Lohri & Baisakhi",
+    "art": "Phulkari Embroidery",
+    "icon": "Golden Temple & Wheat Fields"
+  },
+  "rajasthan": {
+    "dance": "Ghoomar & Kalbelia",
+    "festival": "Gangaur & Teej",
+    "art": "Kathputli (Puppetry) & Bandhani",
+    "icon": "Palaces, Forts & Thar Desert"
+  },
+  "maharashtra": {
+    "dance": "Lavani & Koli",
+    "festival": "Ganesh Utsav & Gudi Padwa",
+    "art": "Warli Painting & Paithani Weaving",
+    "icon": "Shivaji Maharaj Forts & Gateway of India"
+  },
+  "uttar pradesh": {
+    "dance": "Kathak & Charkula",
+    "festival": "Deepawali & Braj Holi",
+    "art": "Chikankari Embroidery & Brassware",
+    "icon": "Taj Mahal & Varanasi Ghats"
+  },
+  "gujarat": {
+    "dance": "Garba & Dandiya Raas",
+    "festival": "Uttarayan (Kite Festival) & Navratri",
+    "art": "Patola Weaving & Lipan Kaam",
+    "icon": "Sabarmati Ashram & Statue of Unity"
+  },
+  "west bengal": {
+    "dance": "Chhau & Kushan",
+    "festival": "Durga Puja & Poila Boishakh",
+    "art": "Alpana Art & Kantha Embroidery",
+    "icon": "Victoria Memorial & Howrah Bridge"
+  },
+  "tamil nadu": {
+    "dance": "Bharatanatyam & Karakattam",
+    "festival": "Pongal & Puthandu",
+    "art": "Tanjore Paintings & Kanchipuram Silk",
+    "icon": "Dravidian Temples & Marina Beach"
+  },
+  "kerala": {
+    "dance": "Kathakali & Mohiniyattam",
+    "festival": "Onam & Vishu",
+    "art": "Kalaripayattu & Mural Paintings",
+    "icon": "Backwaters, Houseboats & Kathakali Masks"
+  },
+  "assam": {
+    "dance": "Bihu & Sattriya",
+    "festival": "Rongali Bihu & Ambubachi Mela",
+    "art": "Muga Silk & Cane Crafts",
+    "icon": "Kaziranga (One-horned Rhino) & Tea Gardens"
+  },
+  "jammu & kashmir": {
+    "dance": "Rouf & Kud",
+    "festival": "Navreh & Tulip Festival",
+    "art": "Pashmina Weaving & Paper Mache",
+    "icon": "Dal Lake Shikaras & snow capped peaks"
+  },
+  "jammu and kashmir": {
+    "dance": "Rouf & Kud",
+    "festival": "Navreh & Tulip Festival",
+    "art": "Pashmina Weaving & Paper Mache",
+    "icon": "Dal Lake Shikaras & snow capped peaks"
+  },
+  "madhya pradesh": {
+    "dance": "Matki & Grida",
+    "festival": "Lokranjan & Khajuraho Dance Festival",
+    "art": "Gond & Chanderi Art",
+    "icon": "Sanchi Stupa & Khajuraho Temples"
+  },
+  "odisha": {
+    "dance": "Odissi & Ghumura",
+    "festival": "Ratha Yatra & Raja Parba",
+    "art": "Pattachitra Paintings & Filigree Work",
+    "icon": "Jagannath Temple & Konark Sun Temple"
+  },
+  "bihar": {
+    "dance": "Jat-Jatin & Bideshiya",
+    "festival": "Chhath Puja & Sama Chakeva",
+    "art": "Madhubani Painting & Sikki Grass Craft",
+    "icon": "Mahabodhi Temple (Bodh Gaya)"
+  },
+  "karnataka": {
+    "dance": "Yakshagana & Dollu Kunitha",
+    "festival": "Mysore Dasara & Ugadi",
+    "art": "Channapatna Toys & Sandalwood Carving",
+    "icon": "Hampi Ruins & Mysore Palace"
+  },
+  "andhra pradesh": {
+    "dance": "Kuchipudi & Vilasini Natyam",
+    "festival": "Ugadi & Tirupati Brahmotsavam",
+    "art": "Kalamkari Painting & Kondapalli Toys",
+    "icon": "Tirumala Venkateswara Temple"
+  },
+  "telangana": {
+    "dance": "Perini Sivatandavam",
+    "festival": "Bathukamma & Bonalu",
+    "art": "Bidriware & Pochampally Ikat",
+    "icon": "Charminar & Kakatiya Kala Thoranam"
+  },
+  "himachal pradesh": {
+    "dance": "Nati & Dangi",
+    "festival": "Kullu Dussehra & Minjar",
+    "art": "Chamba Rumal & Pahari Paintings",
+    "icon": "Himalayan Apples & Kalka-Shimla Toy Train"
+  },
+  "haryana": {
+    "dance": "Saang & Phag",
+    "festival": "Surajkund Crafts Mela & Teej",
+    "art": "Dhurrie Weaving & Clay Pottery",
+    "icon": "Kurukshetra Heritage Sites"
+  },
+  "chhattisgarh": {
+    "dance": "Panthi & Raut Nacha",
+    "festival": "Bastar Dussehra & Hareli",
+    "art": "Dokra Metal Craft",
+    "icon": "Chitrakote Waterfalls"
+  },
+  "jharkhand": {
+    "dance": "Jhumar & Paika",
+    "festival": "Sarhul & Karam",
+    "art": "Sohrai and Khovar Paintings",
+    "icon": "Baidyanath Temple"
+  },
+  "uttarakhand": {
+    "dance": "Choliya & Jhora",
+    "festival": "Ganga Dussehra & Phool Dei",
+    "art": "Aipan Ritual Art",
+    "icon": "Kedarnath Temple & Valley of Flowers"
+  },
+  "goa": {
+    "dance": "Fugdi & Dekhni",
+    "festival": "Goa Carnival & Shigmo",
+    "art": "Coconut Shell Carvings",
+    "icon": "Colonial Churches & Beaches"
+  }
+};
+
+async function initIndiaMap() {
+  const container = document.getElementById('indiaMapContainer');
+  const tooltip = document.getElementById('cultureTooltip');
+  if (!container || !tooltip) return;
+
+  try {
+    // Fetch optimized SVG map of India
+    const response = await fetch('https://cdn.jsdelivr.net/npm/@svg-maps/india@1.0.1/india.svg');
+    if (!response.ok) throw new Error("Failed to load map data");
+
+    const svgText = await response.text();
+    container.innerHTML = svgText;
+
+    const svgElement = container.querySelector('svg');
+    if (!svgElement) return;
+
+    svgElement.removeAttribute('width');
+    svgElement.removeAttribute('height');
+
+    const paths = container.querySelectorAll('path');
+    paths.forEach(path => {
+      path.addEventListener('mouseenter', () => {
+        const stateName = path.getAttribute('name') || '';
+        const stateKey = stateName.toLowerCase().trim();
+        const info = STATE_CULTURES[stateKey];
+
+        tooltip.style.display = 'block';
+        if (info) {
+          tooltip.innerHTML = `
+            <h4>🎉 ${stateName}</h4>
+            <p><strong>Traditional Dance:</strong> ${info.dance}</p>
+            <p><strong>Key Festival:</strong> ${info.festival}</p>
+            <p><strong>Art & Craft:</strong> ${info.art}</p>
+            <p><strong>Iconic Landmark:</strong> ${info.icon}</p>
+          `;
+        } else {
+          tooltip.innerHTML = `<h4>🎉 ${stateName}</h4><p>Cultural heritage loaded.</p>`;
+        }
+      });
+
+      path.addEventListener('mousemove', (e) => {
+        const offset = 18;
+        tooltip.style.left = (e.pageX + offset) + 'px';
+        tooltip.style.top = (e.pageY + offset) + 'px';
+      });
+
+      path.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
+      });
+    });
+
+  } catch (err) {
+    console.warn("India Map loading bypassed:", err);
+    container.style.display = 'none';
+  }
+}
+
+// Initialise on load
+document.addEventListener('DOMContentLoaded', () => {
+  initIndiaMap();
+});
