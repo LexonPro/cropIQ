@@ -1148,16 +1148,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }, false);
   }
 
-  // Register Progressive Web App Service Worker
+  // Unregister active service workers to prevent caching/loading issues during updates
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('✅ ServiceWorker registered: ', registration.scope);
-        })
-        .catch(err => {
-          console.warn('❌ ServiceWorker registration failed: ', err);
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      for (let registration of registrations) {
+        registration.unregister().then(() => {
+          console.log('🗑️ Active ServiceWorker unregistered.');
         });
+      }
+    }).catch(err => {
+      console.warn('SW unregistration failed:', err);
     });
   }
 });
