@@ -1036,14 +1036,15 @@ img, svg { display: block; }
 .india-map-watermark-container {
   position: fixed;
   top: 50%;
-  right: -5%;
-  transform: translateY(-50%);
-  width: 45%;
-  height: 80vh;
-  z-index: 10;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(85vw, 85vh);
+  height: auto;
+  max-height: 85vh;
+  z-index: 3;
   pointer-events: none;
-  opacity: 0.25;
-  transition: opacity 0.3s ease, right 0.3s ease;
+  opacity: 0.22;
+  transition: opacity 0.3s ease;
 }
 
 .india-map-watermark-container:hover {
@@ -1116,18 +1117,7 @@ img, svg { display: block; }
   color: var(--gray-800);
 }
 
-@media (max-width: 1024px) {
-  .india-map-watermark-container {
-    position: relative;
-    top: 0;
-    right: 0;
-    transform: none;
-    width: 90%;
-    height: 50vh;
-    margin: 40px auto;
-    opacity: 0.4;
-  }
-}
+
 
 /* ---------- 📑 TABS CONTROLLER ---------- */
 .tab-btn {

@@ -700,9 +700,35 @@ async function initIndiaMap() {
     svgElement.removeAttribute('width');
     svgElement.removeAttribute('height');
 
+    const pastelColors = [
+      { fill: 'rgba(254, 226, 226, 0.45)', stroke: '#b91c1c' }, // Pastel Red
+      { fill: 'rgba(254, 243, 199, 0.45)', stroke: '#d97706' }, // Pastel Amber
+      { fill: 'rgba(220, 252, 231, 0.45)', stroke: '#15803d' }, // Pastel Green
+      { fill: 'rgba(204, 251, 241, 0.45)', stroke: '#0d9488' }, // Pastel Teal
+      { fill: 'rgba(219, 234, 254, 0.45)', stroke: '#1d4ed8' }, // Pastel Blue
+      { fill: 'rgba(238, 242, 255, 0.45)', stroke: '#4f46e5' }, // Pastel Indigo
+      { fill: 'rgba(243, 232, 255, 0.45)', stroke: '#7e22ce' }, // Pastel Purple
+      { fill: 'rgba(252, 231, 243, 0.45)', stroke: '#be185d' }, // Pastel Pink
+      { fill: 'rgba(254, 237, 222, 0.45)', stroke: '#ea580c' }, // Pastel Orange
+      { fill: 'rgba(224, 242, 254, 0.45)', stroke: '#0284c7' }  // Pastel Sky Blue
+    ];
+
     const paths = container.querySelectorAll('path');
-    paths.forEach(path => {
+    paths.forEach((path, index) => {
+      // Deterministically assign color based on index
+      const color = pastelColors[index % pastelColors.length];
+      path.setAttribute('style', `fill: ${color.fill} !important; stroke: ${color.stroke} !important; stroke-width: 1.5px !important; transition: fill 0.2s ease, stroke-width 0.2s ease, stroke 0.2s ease;`);
+      
+      // Store on dataset for restore
+      path.dataset.originalFill = color.fill;
+      path.dataset.originalStroke = color.stroke;
+
       path.addEventListener('mouseenter', () => {
+        // Highlighting hovered state in bright golden yellow
+        path.style.setProperty('fill', '#facc15', 'important');
+        path.style.setProperty('stroke', '#ca8a04', 'important');
+        path.style.setProperty('stroke-width', '2.5px', 'important');
+
         const stateName = path.getAttribute('name') || '';
         const stateKey = stateName.toLowerCase().trim();
         const info = STATE_CULTURES[stateKey];
@@ -729,6 +755,10 @@ async function initIndiaMap() {
 
       path.addEventListener('mouseleave', () => {
         tooltip.style.display = 'none';
+        // Restore original shades
+        path.style.setProperty('fill', path.dataset.originalFill, 'important');
+        path.style.setProperty('stroke', path.dataset.originalStroke, 'important');
+        path.style.setProperty('stroke-width', '1.5px', 'important');
       });
     });
 
