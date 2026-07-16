@@ -287,6 +287,10 @@ function setLoading(isLoading) {
 // ❌ ERROR HANDLING
 // =======================
 function showError(msg) {
+  if (!msg || String(msg).trim() === "") {
+    hideError();
+    return;
+  }
   const msgEl = document.getElementById('errorMessage');
   const banner = document.getElementById('errorBanner');
   if (msgEl) msgEl.innerText = msg;
