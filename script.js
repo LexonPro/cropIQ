@@ -25,11 +25,7 @@ function getAuthHeaders() {
 
 function handleAuthError(status) {
   if (status === 401) {
-    // Token expired or invalid → back to login
-    localStorage.removeItem('cropiq_token');
-    localStorage.removeItem('cropiq_name');
-    localStorage.removeItem('cropiq_email');
-    window.location.href = 'login.html';
+    console.warn("Auth error detected, but login redirects are bypassed.");
   }
 }
 

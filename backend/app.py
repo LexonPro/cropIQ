@@ -102,17 +102,12 @@ def decode_token(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
-    if not credentials:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    return decode_token(credentials.credentials)
+    # Bypassed authentication to allow open access
+    return {"sub": "guest@cropiq.com", "admin": True}
 
 def require_admin(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
-    if not credentials:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    payload = decode_token(credentials.credentials)
-    if not payload.get("admin"):
-        raise HTTPException(status_code=403, detail="Admin access required")
-    return payload
+    # Bypassed authentication to allow open access
+    return {"sub": "admin@cropiq.com", "admin": True}
 
 # =========================
 # 📊 PYDANTIC MODELS

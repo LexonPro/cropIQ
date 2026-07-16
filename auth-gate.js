@@ -17,20 +17,16 @@ const EMAIL_KEY   = 'cropiq_email';
 // =======================
 // 🔍 GETTERS
 // =======================
-function getToken()   { return localStorage.getItem(SESSION_KEY) || ''; }
-function getName()    { return localStorage.getItem(NAME_KEY)    || 'User'; }
-function getEmail()   { return localStorage.getItem(EMAIL_KEY)   || ''; }
-function isLoggedIn() { return !!getToken(); }
+function getToken()   { return 'bypassed-token'; }
+function getName()    { return 'Guest Farmer'; }
+function getEmail()   { return 'guest@cropiq.com'; }
+function isLoggedIn() { return true; }
 
 // =======================
 // 🚪 LOGOUT
 // =======================
 function handleLogout() {
-  localStorage.removeItem(SESSION_KEY);
-  localStorage.removeItem(NAME_KEY);
-  localStorage.removeItem(EMAIL_KEY);
-  localStorage.removeItem('cropiq_is_admin');
-  window.location.href = 'login.html';
+  // Bypassed auth logout
 }
 
 // =======================
@@ -38,10 +34,7 @@ function handleLogout() {
 // 🔒 AUTH GATE
 // =======================
 document.addEventListener('DOMContentLoaded', async function () {
-  if (!isLoggedIn()) {
-    await silentGuestLogin();
-  }
-  showUserInNavbar();
+  // Bypassed auth validation check
 });
 
 // =======================

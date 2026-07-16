@@ -1040,8 +1040,8 @@ img, svg { display: block; }
   transform: translateY(-50%);
   width: 45%;
   height: 80vh;
-  z-index: 1;
-  pointer-events: all;
+  z-index: 10;
+  pointer-events: none;
   opacity: 0.25;
   transition: opacity 0.3s ease, right 0.3s ease;
 }
@@ -1057,9 +1057,11 @@ img, svg { display: block; }
   stroke: rgba(21, 128, 61, 0.45);
   stroke-width: 1;
   stroke-linejoin: round;
+  pointer-events: none;
 }
 
 .india-map-watermark-container path {
+  pointer-events: auto;
   cursor: pointer;
   transition: fill 0.25s ease, stroke-width 0.2s ease, stroke 0.2s ease, filter 0.2s ease;
 }
