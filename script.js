@@ -902,12 +902,13 @@ async function fetchMandiPrices() {
         <div class="mandi-prices-row">
           <div>
             <span class="mandi-price-lbl">Average Price</span>
-            <div class="mandi-price-val">₹${p.avg}</div>
+            <div class="mandi-price-val">₹${p.avg} <span style="font-size:0.7rem; font-weight:500; opacity:0.6;">/ quintal</span></div>
+            <div style="font-size:0.75rem; font-weight:600; color:var(--marigold-500); margin-top:2px;">(₹${(p.avg / 100).toFixed(2)} per kg)</div>
           </div>
           <div style="text-align: right;">
             <span class="mandi-price-lbl">Range (Min - Max)</span>
-            <div style="font-size:0.82rem; font-weight:600; color:var(--gray-600); margin-top:2px;">₹${p.min} - ₹${p.max}</div>
-            <span style="font-size:0.65rem; color:var(--gray-400);">per quintal</span>
+            <div style="font-size:0.85rem; font-weight:600; margin-top:2px;">₹${p.min} - ₹${p.max}</div>
+            <span style="font-size:0.68rem; opacity:0.6;">(₹${(p.min / 100).toFixed(1)} - ₹${(p.max / 100).toFixed(1)} per kg)</span>
           </div>
         </div>
       `;
