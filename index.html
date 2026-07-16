@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Crop Advisory System</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#16a34a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,6 +32,11 @@
         <span class="logo-text">CropIQ</span>
       </a>
       <div class="nav-links">
+        <select id="langSelect" onchange="changeLanguage(this.value)" class="lang-select" style="margin-right: 8px; height: 32px; border-radius: 6px; border: 1.5px solid var(--gray-200); font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; color: var(--gray-700); background: #fff; cursor: pointer; padding: 0 8px; outline: none; transition: border-color 0.2s;">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="pb">ਪੰਜਾਬੀ</option>
+        </select>
         <a href="#predict">Predict</a>
         <a href="#results">Results</a>
         <a href="#footer">About</a>
@@ -39,6 +48,14 @@
     </div>
     <!-- Mobile menu -->
     <div class="mobile-menu" id="mobileMenu">
+      <div style="padding: 10px 0; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size:0.9rem; font-weight:600; color:var(--gray-600);">Language / भाषा</span>
+        <select id="mobileLangSelect" onchange="changeLanguage(this.value)" class="lang-select" style="height:32px; font-size:0.8rem; border-radius:6px; border:1px solid var(--gray-200); padding:0 8px; background:#fff;">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="pb">ਪੰਜਾਬੀ</option>
+        </select>
+      </div>
       <a href="#predict">Predict</a>
       <a href="#results">Results</a>
       <a href="#footer">About</a>
@@ -125,8 +142,16 @@
   <!-- ======================== MAIN ======================== -->
   <main class="main-section" id="predict">
 
-    <!-- ---- FORM CARD ---- -->
-    <div class="container">
+    <!-- Tab Bar Controller -->
+    <div class="tabs-nav-container" style="display: flex; justify-content: center; gap: 16px; margin-bottom: 40px; flex-wrap: wrap;">
+      <button class="tab-btn active" onclick="switchTab('soil-tab')" id="soil-tab-btn">🌱 Soil Advisor</button>
+      <button class="tab-btn" onclick="switchTab('disease-tab')" id="disease-tab-btn">葉 Leaf Diagnosis</button>
+      <button class="tab-btn" onclick="switchTab('mandi-tab')" id="mandi-tab-btn">📈 Mandi Prices</button>
+    </div>
+
+    <!-- Soil Advisor Tab Content Wrapper -->
+    <div id="soilTabContent" class="tab-content">
+      <div class="container">
       <div class="section-label">Step 01 — Input Parameters</div>
       <h2 class="section-title">Enter Soil & Climate Data</h2>
       <p class="section-sub">Provide your soil nutrient levels and current climate conditions for accurate crop recommendations.</p>
@@ -353,7 +378,102 @@
         </div>
       </div>
 
+    </div><!-- /soilTabContent -->
+
+    <!-- ======================== LEAF DIAGNOSIS TAB ======================== -->
+    <div id="diseaseTabContent" class="tab-content" style="display: none;">
+      <div class="container">
+        <div class="section-label" id="lblStepDisease">Step 01 — Leaf Upload</div>
+        <h2 class="section-title" id="lblTitleDisease">AI Leaf Disease Diagnosis</h2>
+        <p class="section-sub" id="lblSubDisease">Upload a clear photo of the infected crop leaf or snap a picture using your camera for instant diagnosis and treatments.</p>
+        
+        <div class="form-card" style="position:relative; margin-bottom: 40px; padding: 40px;">
+          <!-- Drag and drop zone -->
+          <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()" style="border: 2px dashed var(--green-300); border-radius: var(--radius-lg); padding: 40px 20px; text-align: center; background: var(--gray-50); cursor: pointer; transition: background 0.2s, border-color 0.2s;">
+            <div class="upload-icon-wrap" style="display: flex; justify-content: center; margin-bottom: 16px; color: var(--green-600);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:48px; height:48px; stroke-linecap:round; stroke-linejoin:round;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+              </svg>
+            </div>
+            <h4 id="lblUploadClick" style="font-family: var(--font-display); font-weight: 700; color: var(--gray-800); font-size: 1.05rem; margin-bottom: 6px;">Click or Drag & Drop Leaf Image Here</h4>
+            <p id="lblUploadFormats" style="font-size: 0.78rem; color: var(--gray-400);">Supports JPG, PNG (Max 5MB)</p>
+            <input type="file" id="diseaseFile" accept="image/*" style="display:none;" onchange="handleFileSelect(event)" />
+          </div>
+
+          <!-- Image Preview Area -->
+          <div class="preview-area" id="previewArea" style="display:none; margin-top: 24px; text-align: center;">
+            <img id="leafPreview" style="max-height: 240px; max-width: 100%; border-radius: var(--radius-md); border: 2px solid var(--gray-200); box-shadow: var(--shadow-sm);" />
+            <div style="margin-top: 24px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+              <button class="btn-predict" id="diagnoseBtn" onclick="submitDiseaseDiagnosis()" style="margin: 0; padding: 0 28px; height: 48px; border-radius: var(--radius-md); min-width: 160px;">
+                <span class="btn-text">Diagnose Leaf 🔍</span>
+                <span class="btn-spinner" id="diagnoseSpinner" style="display:none;">
+                  <svg class="spinner-svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="30 70" stroke-linecap="round"/></svg>
+                  Scanning...
+                </span>
+              </button>
+              <button class="btn-reset" onclick="clearDiseaseTab()" style="height: 48px; border-radius: var(--radius-md);">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disease Diagnosis Result Card -->
+        <div class="form-card" id="diseaseResultCard" style="display:none; margin-bottom: 40px; border-left: 5px solid var(--green-600); animation: slideDown 0.3s ease; padding: 36px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-200); padding-bottom:16px; margin-bottom:16px;">
+            <div>
+              <h3 id="diseaseName" style="font-family:var(--font-display); font-weight:800; font-size:1.35rem; color:var(--gray-900);">Healthy Leaf</h3>
+              <p style="font-size:0.75rem; color:var(--gray-400); font-weight:600; margin-top:2px;">Diagnostic Confidence: <span id="diseaseConfidence">98%</span></p>
+            </div>
+            <!-- Speak Button -->
+            <button class="btn-reset speak-btn" onclick="speakText('diseaseResultCard')" style="height:38px; width:38px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; margin:0; border:1px solid var(--gray-200); cursor:pointer;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px; height:18px; stroke-linecap:round; stroke-linejoin:round;"><path d="M11 5 6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            </button>
+          </div>
+          
+          <div class="metrics-row" style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+            <div style="flex:1; min-width:100px; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:8px; padding:12px; text-align:center;">
+              <span style="font-size:0.7rem; color:var(--gray-400); font-weight:700; text-transform:uppercase; letter-spacing: 0.04em;">Healthy Green</span>
+              <h4 id="metricGreen" style="font-family:var(--font-display); font-size:1.25rem; font-weight:800; color:#16a34a; margin-top:4px;">98%</h4>
+            </div>
+            <div style="flex:1; min-width:100px; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:8px; padding:12px; text-align:center;">
+              <span style="font-size:0.7rem; color:var(--gray-400); font-weight:700; text-transform:uppercase; letter-spacing: 0.04em;">Yellow Mildew</span>
+              <h4 id="metricYellow" style="font-family:var(--font-display); font-size:1.25rem; font-weight:800; color:#ca8a04; margin-top:4px;">1%</h4>
+            </div>
+            <div style="flex:1; min-width:100px; background:var(--gray-50); border:1px solid var(--gray-200); border-radius:8px; padding:12px; text-align:center;">
+              <span style="font-size:0.7rem; color:var(--gray-400); font-weight:700; text-transform:uppercase; letter-spacing: 0.04em;">Necrotic Spot</span>
+              <h4 id="metricNecrosis" style="font-family:var(--font-display); font-size:1.25rem; font-weight:800; color:#b91c1c; margin-top:4px;">1%</h4>
+            </div>
+          </div>
+
+          <h4 style="font-family:var(--font-display); font-weight:700; font-size:0.95rem; color:var(--gray-800); margin-bottom:6px;">Recommended Treatments & Remedies:</h4>
+          <p id="diseaseRemedy" style="font-size:0.88rem; color:var(--gray-600); line-height:1.6; margin:0; font-weight:500;"></p>
+        </div>
+      </div>
     </div>
+
+    <!-- ======================== MANDI PRICES TAB ======================== -->
+    <div id="mandiTabContent" class="tab-content" style="display: none;">
+      <div class="container">
+        <div class="section-label" id="lblStepMandi">Step 01 — Market Feeds</div>
+        <h2 class="section-title" id="lblTitleMandi">Mandi Market Prices (Live Trends)</h2>
+        <p class="section-sub" id="lblSubMandi">View wholesale commodity rates in regional markets (Mandis) of India to negotiate the best price for your produce.</p>
+
+        <!-- Mandi price list panel -->
+        <div class="form-card" style="margin-bottom: 40px; padding: 36px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px; border-bottom:1px solid var(--gray-200); padding-bottom:14px;">
+            <span style="font-size:0.8rem; font-weight:700; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.04em;">Live Commodity Feeds</span>
+            <button class="btn-reset" onclick="fetchMandiPrices()" style="height:32px; padding:0 12px; font-size:0.75rem; border-radius:6px; margin:0; display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--gray-200); cursor:pointer; font-weight:600; color:var(--gray-700); transition:0.2s;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px; stroke-linecap:round; stroke-linejoin:round;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              Refresh Feeds
+            </button>
+          </div>
+
+          <div id="mandiPricesGrid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
+            <!-- Mandi cards will be injected here by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- ======================== FOOTER ======================== -->

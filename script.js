@@ -231,10 +231,21 @@ function renderCards(predictions) {
   predictions.forEach((item, index) => {
     const card = document.createElement('div');
     card.className = `pred-card ${rankClass[index] || ''}`;
+    card.id = `predCard_${index}`;
 
     card.innerHTML = `
-      <h3>#${index + 1} ${item.crop}</h3>
-      <p>${Math.round(item.confidence * 100)}%</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <span class="pred-rank-badge">#${index + 1}</span>
+        <button class="btn-reset speak-btn" onclick="speakText('predCard_${index}')" style="height:28px; width:28px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; margin:0; border:1px solid var(--gray-200); cursor:pointer;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px; stroke-linecap:round; stroke-linejoin:round;"><path d="M11 5 6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+        </button>
+      </div>
+      <h3 class="pred-crop-name" style="margin-bottom: 4px;">${item.crop}</h3>
+      <p class="pred-label" style="margin-bottom: 14px;">Suitability Match</p>
+      <div class="pred-confidence-val" style="margin-bottom: 8px;">${Math.round(item.confidence * 100)}%</div>
+      <div class="pred-bar-track">
+        <div class="pred-bar-fill" style="width: ${Math.round(item.confidence * 100)}%"></div>
+      </div>
     `;
 
     grid.appendChild(card);
@@ -448,8 +459,9 @@ function renderAdvisory(advisory) {
   wrap.style.display = 'block';
   grid.innerHTML = '';
 
-  advisory.advice.forEach(item => {
+  advisory.advice.forEach((item, index) => {
     const card = document.createElement('div');
+    card.id = `advCard_${index}`;
     
     // Status colors
     let badgeBg = 'var(--gray-100)';
@@ -506,7 +518,12 @@ function renderAdvisory(advisory) {
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <h4 style="font-family:var(--font-display); font-weight:700; font-size:1.05rem; color:var(--gray-900); margin:0;">${item.nutrient}</h4>
-        <span style="font-size:0.68rem; font-weight:800; padding:3px 9px; border-radius:100px; background:${badgeBg}; color:${badgeColor}; letter-spacing:0.04em;">${statusText}</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:0.68rem; font-weight:800; padding:3px 9px; border-radius:100px; background:${badgeBg}; color:${badgeColor}; letter-spacing:0.04em;">${statusText}</span>
+          <button class="btn-reset speak-btn" onclick="speakText('advCard_${index}')" style="height:26px; width:26px; padding:0; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; margin:0; border:1px solid var(--gray-200); cursor:pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px; stroke-linecap:round; stroke-linejoin:round;"><path d="M11 5 6 9H2v6h4l5 4V5zM15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+          </button>
+        </div>
       </div>
       <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
         <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--gray-500); font-weight:600;">
@@ -725,7 +742,426 @@ async function initIndiaMap() {
   }
 }
 
-// Initialise on load
+// =======================
+// 📑 TAB SWITCHER LOGIC
+// =======================
+function switchTab(tabId) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.style.display = 'none';
+  });
+
+  // Remove active class from all tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  // Show active tab content and add active class to button
+  if (tabId === 'soil-tab') {
+    document.getElementById('soilTabContent').style.display = 'block';
+    document.getElementById('soil-tab-btn').classList.add('active');
+  } else if (tabId === 'disease-tab') {
+    document.getElementById('diseaseTabContent').style.display = 'block';
+    document.getElementById('disease-tab-btn').classList.add('active');
+  } else if (tabId === 'mandi-tab') {
+    document.getElementById('mandiTabContent').style.display = 'block';
+    document.getElementById('mandi-tab-btn').classList.add('active');
+    fetchMandiPrices(); // auto-fetch when entering tab
+  }
+}
+
+// =======================
+// 🗣️ TEXT-TO-SPEECH ACCESSIBILITY
+// =======================
+function speakText(elementId) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
+  const btn = element.querySelector('.speak-btn');
+  if (btn) btn.classList.add('active');
+
+  // Cancel any ongoing speech
+  window.speechSynthesis.cancel();
+
+  let textToSpeak = "";
+  if (elementId === 'diseaseResultCard') {
+    const dName = document.getElementById('diseaseName').innerText;
+    const dConf = document.getElementById('diseaseConfidence').innerText;
+    const dRemedy = document.getElementById('diseaseRemedy').innerText;
+    textToSpeak = `${dName}. Confidence: ${dConf}. Recommended Treatment: ${dRemedy}`;
+  } else {
+    // Read clean text content
+    textToSpeak = element.innerText;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(textToSpeak);
+  
+  // Localize voice synthesis language
+  const lang = localStorage.getItem('cropiq_lang') || 'en';
+  if (lang === 'hi') {
+    utterance.lang = 'hi-IN';
+  } else if (lang === 'pb') {
+    utterance.lang = 'pa-IN';
+  } else {
+    utterance.lang = 'en-US';
+  }
+
+  utterance.onend = () => {
+    if (btn) btn.classList.remove('active');
+  };
+  utterance.onerror = () => {
+    if (btn) btn.classList.remove('active');
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+// =======================
+// 🌐 MULTILINGUAL SYSTEM
+// =======================
+const TRANSLATIONS = {
+  en: {
+    title: "Enter Soil & Climate Data",
+    subtitle: "Provide your soil nutrient levels and current climate conditions for accurate crop recommendations.",
+    btn_predict: "Analyze Crop",
+    btn_reset: "Reset",
+    nav_predict: "Predict",
+    nav_results: "Results",
+    nav_about: "About",
+    step_input: "Step 01 — Input Parameters",
+    step_results: "Step 02 — Results",
+    results_title: "Top 3 Crop Predictions",
+    results_sub: "Based on your soil and climate data, our AI model recommends the following crops.",
+    advisory_step: "Step 03 — Agronomical Prescriptions",
+    advisory_title: "AI Soil Diagnostics & Prescription Advisory",
+    advisory_sub: "Computed balanced mineral target thresholds and calculated customized fertilizer recipe cards for optimal growth.",
+    soil_tab: "🌱 Soil Advisor",
+    disease_tab: "葉 Leaf Diagnosis",
+    mandi_tab: "📈 Mandi Prices",
+    lbl_step_disease: "Step 01 — Leaf Upload",
+    lbl_title_disease: "AI Leaf Disease Diagnosis",
+    lbl_sub_disease: "Upload a clear photo of the infected crop leaf or snap a picture using your camera for instant diagnosis and treatments.",
+    lbl_upload_click: "Click or Drag & Drop Leaf Image Here",
+    lbl_upload_formats: "Supports JPG, PNG (Max 5MB)",
+    lbl_step_mandi: "Step 01 — Market Feeds",
+    lbl_title_mandi: "Mandi Market Prices (Live Trends)",
+    lbl_sub_mandi: "View wholesale commodity rates in regional markets (Mandis) of India to negotiate the best price for your produce."
+  },
+  hi: {
+    title: "मिट्टी और जलवायु का विवरण भरें",
+    subtitle: "सटीक फसल सिफारिशों के लिए अपनी मिट्टी के पोषक स्तर और वर्तमान जलवायु स्थिति प्रदान करें।",
+    btn_predict: "फसल विश्लेषण करें",
+    btn_reset: "रीसेट करें",
+    nav_predict: "पूर्वानुमान",
+    nav_results: "परिणाम",
+    nav_about: "विवरण",
+    step_input: "चरण 01 — इनपुट पैरामीटर",
+    step_results: "चरण 02 — परिणाम",
+    results_title: "शीर्ष 3 फसल सिफारिशें",
+    results_sub: "आपकी मिट्टी और जलवायु डेटा के आधार पर, हमारा एआई मॉडल इन फसलों की सिफारिश करता है।",
+    advisory_step: "चरण 03 — कृषि नुस्खे",
+    advisory_title: "एआई मृदा निदान और उर्वरक नुस्खा सलाहकार",
+    advisory_sub: "अनुकूलतम विकास के लिए संतुलित खनिज लक्ष्य सीमा और अनुकूलित उर्वरक खुराक की गणना की गई।",
+    soil_tab: "🌱 मृदा सलाहकार",
+    disease_tab: "葉 पत्ती रोग निदान",
+    mandi_tab: "📈 मंडी भाव",
+    lbl_step_disease: "चरण 01 — पत्ती फोटो अपलोड",
+    lbl_title_disease: "एआई पत्ती रोग निदान",
+    lbl_sub_disease: "तुरंत निदान और उपचार के लिए संक्रमित फसल की पत्ती का स्पष्ट फोटो अपलोड करें या अपने कैमरे से तस्वीर लें।",
+    lbl_upload_click: "यहाँ क्लिक करें या पत्ती की तस्वीर खींचकर लाएँ",
+    lbl_upload_formats: "JPG, PNG फाइलों का समर्थन (अधिकतम 5MB)",
+    lbl_step_mandi: "चरण 01 — बाजार भाव",
+    lbl_title_mandi: "मंडी बाजार भाव (ताजा जानकारी)",
+    lbl_sub_mandi: "अपनी उपज का सर्वोत्तम मूल्य प्राप्त करने के लिए भारत के क्षेत्रीय बाजारों (मंडियों) में थोक दरों को देखें।"
+  },
+  pb: {
+    title: "ਮਿੱਟੀ ਅਤੇ ਜਲਵਾਯੂ ਦਾ ਵੇਰਵਾ ਭਰੋ",
+    subtitle: "ਸਹੀ ਫਸਲ ਦੀਆਂ ਸਿਫ਼ਾਰਸ਼ਾਂ ਲਈ ਆਪਣੀ ਮਿੱਟੀ ਦੇ ਪੋਸ਼ਕ ਤੱਤਾਂ ਦੇ ਪੱਧਰ ਅਤੇ ਮੌਜੂਦਾ ਜਲਵਾਯੂ ਸਥਿਤੀ ਪ੍ਰਦਾਨ ਕਰੋ।",
+    btn_predict: "ਫਸਲ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ ਕਰੋ",
+    btn_reset: "ਰੀਸੈਟ ਕਰੋ",
+    nav_predict: "ਪੂਰਵ-ਅਨੁਮਾਨ",
+    nav_results: "ਨਤੀਜੇ",
+    nav_about: "ਵੇਰਵੇ",
+    step_input: "ਕਦਮ 01 — ਇਨਪੁਟ ਪੈਰਾਮੀਟਰ",
+    step_results: "ਕਦਮ 02 — ਨਤੀਜੇ",
+    results_title: "ਚੋਟੀ ਦੀਆਂ 3 ਫਸਲਾਂ ਦੀਆਂ ਸਿਫ਼ਾਰਸ਼ਾਂ",
+    results_sub: "ਤੁਹਾਡੀ ਮਿੱਟੀ ਅਤੇ ਜਲਵਾਯੂ ਦੇ ਅੰਕੜਿਆਂ ਦੇ ਅਧਾਰ ਤੇ, ਸਾਡਾ ਏਆਈ ਮਾਡਲ ਇਹਨਾਂ ਫਸਲਾਂ ਦੀ ਸਿਫਾਰਸ਼ ਕਰਦਾ ਹੈ।",
+    advisory_step: "ਕਦਮ 03 — ਖੇਤੀਬਾੜੀ ਨੁਸਖੇ",
+    advisory_title: "ਏਆਈ ਮਿੱਟੀ ਦੀ ਜਾਂਚ ਅਤੇ ਖਾਦ ਸਲਾਹਕਾਰ",
+    advisory_sub: "ਵਧੀਆ ਵਿਕਾਸ ਲਈ ਸੰਤੁਲਿਤ ਖਣਿਜ ਟੀਚੇ ਦੇ ਪੱਧਰ ਅਤੇ ਅਨੁਕੂਲਿਤ ਖਾਦ ਦੀ ਖੁਰਾਕ ਦੀ ਗਣਨਾ ਕੀਤੀ ਗਈ।",
+    soil_tab: "🌱 ਮਿੱਟੀ ਸਲਾਹਕਾਰ",
+    disease_tab: "葉 ਪੱਤੇ ਦੇ ਰੋਗਾਂ ਦੀ ਜਾਂਚ",
+    mandi_tab: "📈 ਮੰਡੀ ਦੇ ਭਾਅ",
+    lbl_step_disease: "ਕਦਮ 01 — ਪੱਤੇ ਦੀ ਫੋਟੋ ਅਪਲੋਡ",
+    lbl_title_disease: "ਏਆਈ ਪੱਤੇ ਦੇ ਰੋਗਾਂ ਦੀ ਜਾਂਚ",
+    lbl_sub_disease: "ਤੁਰੰਤ ਜਾਂਚ ਅਤੇ ਇਲਾਜ ਲਈ ਇਨਫੈਕਟਿਡ ਫਸਲ ਦੇ ਪੱਤੇ ਦੀ ਸਾਫ਼ ਫੋਟੋ ਅਪਲੋਡ ਕਰੋ ਜਾਂ ਆਪਣੇ ਕੈਮਰੇ ਨਾਲ ਫੋਟੋ ਖਿੱਚੋ।",
+    lbl_upload_click: "ਇੱਥੇ ਕਲਿੱਕ ਕਰੋ ਜਾਂ ਪੱਤੇ ਦੀ ਫੋਟੋ ਖਿੱਚ ਕੇ ਲਿਆਓ",
+    lbl_upload_formats: "JPG, PNG ਫਾਈਲਾਂ ਦਾ ਸਮਰਥਨ (ਅਧਿਕਤਮ 5MB)",
+    lbl_step_mandi: "ਕਦਮ 01 — ਬਾਜ਼ਾਰ ਦੇ ਭਾਅ",
+    lbl_title_mandi: "ਮੰਡੀ ਬਾਜ਼ਾਰ ਦੇ ਭਾਅ (ਤਾਜ਼ਾ ਜਾਣਕਾਰੀ)",
+    lbl_sub_mandi: "ਆਪਣੀ ਫਸਲ ਦਾ ਸਭ ਤੋਂ ਵਧੀਆ ਮੁੱਲ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਭਾਰਤ ਦੇ ਖੇਤਰੀ ਬਾਜ਼ਾਰਾਂ (ਮੰਡੀਆਂ) ਦੇ ਥੋਕ ਭਾਅ ਦੇਖੋ।"
+  }
+};
+
+function changeLanguage(langCode) {
+  localStorage.setItem('cropiq_lang', langCode);
+  
+  // Sync selector elements
+  const desktopSelector = document.getElementById('langSelect');
+  const mobileSelector = document.getElementById('mobileLangSelect');
+  if (desktopSelector) desktopSelector.value = langCode;
+  if (mobileSelector) mobileSelector.value = langCode;
+
+  const t = TRANSLATIONS[langCode];
+  if (!t) return;
+
+  // Perform translation re-writes
+  const writeText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+  };
+
+  // Navbars
+  document.querySelectorAll('.nav-links a[href="#predict"], .mobile-menu a[href="#predict"]').forEach(el => el.innerText = t.nav_predict);
+  document.querySelectorAll('.nav-links a[href="#results"], .mobile-menu a[href="#results"]').forEach(el => el.innerText = t.nav_results);
+  document.querySelectorAll('.nav-links a[href="#footer"], .mobile-menu a[href="#footer"]').forEach(el => el.innerText = t.nav_about);
+
+  // Tabs buttons
+  writeText('soil-tab-btn', t.soil_tab);
+  writeText('disease-tab-btn', t.disease_tab);
+  writeText('mandi-tab-btn', t.mandi_tab);
+
+  // Soil Advisor fields
+  document.querySelector('#soilTabContent .section-title').innerText = t.title;
+  document.querySelector('#soilTabContent .section-sub').innerText = t.subtitle;
+  document.querySelector('#soilTabContent .section-label').innerText = t.step_input;
+  writeText('predictBtn', t.btn_predict);
+  
+  // Predictions results titles
+  document.querySelector('#results .section-label').innerText = t.step_results;
+  document.querySelector('#results .section-title').innerText = t.results_title;
+  document.querySelector('#results .section-sub').innerText = t.results_sub;
+  
+  // Advisory titles
+  document.querySelector('#advisoryWrap .section-label').innerText = t.advisory_step;
+  document.querySelector('#advisoryWrap .section-title').innerText = t.advisory_title;
+  document.querySelector('#advisoryWrap .section-sub').innerText = t.advisory_sub;
+
+  // Disease tab elements
+  writeText('lblStepDisease', t.lbl_step_disease);
+  writeText('lblTitleDisease', t.lbl_title_disease);
+  writeText('lblSubDisease', t.lbl_sub_disease);
+  writeText('lblUploadClick', t.lbl_upload_click);
+  writeText('lblUploadFormats', t.lbl_upload_formats);
+
+  // Mandi tab elements
+  writeText('lblStepMandi', t.lbl_step_mandi);
+  writeText('lblTitleMandi', t.lbl_title_mandi);
+  writeText('lblSubMandi', t.lbl_sub_mandi);
+}
+
+// =======================
+// 🩺 AI LEAF DISEASE PREDICTION
+// =======================
+let selectedDiseaseFile = null;
+
+function triggerFileInput() {
+  document.getElementById('diseaseFile').click();
+}
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  selectedDiseaseFile = file;
+  
+  // Render local preview
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('leafPreview').src = e.target.result;
+    document.getElementById('uploadZone').style.display = 'none';
+    document.getElementById('previewArea').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearDiseaseTab() {
+  selectedDiseaseFile = null;
+  document.getElementById('diseaseFile').value = '';
+  document.getElementById('uploadZone').style.display = 'block';
+  document.getElementById('previewArea').style.display = 'none';
+  document.getElementById('diseaseResultCard').style.display = 'none';
+}
+
+async function submitDiseaseDiagnosis() {
+  if (!selectedDiseaseFile) return;
+
+  if (!isLoggedIn()) {
+    showLoginModal();
+    return;
+  }
+
+  const btn = document.getElementById('diagnoseBtn');
+  const spinner = document.getElementById('diagnoseSpinner');
+  btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline-flex';
+
+  const formData = new FormData();
+  formData.append('file', selectedDiseaseFile);
+
+  try {
+    const response = await fetchWithRetry(`${API_URL}/predict-disease`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('cropiq_token') || ''}`
+        // Do NOT set Content-Type header when sending FormData!
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || "Diagnosis failed");
+
+    // Render diagnostic card
+    document.getElementById('diseaseResultCard').style.display = 'block';
+    document.getElementById('diseaseName').innerText = data.disease;
+    document.getElementById('diseaseConfidence').innerText = `${data.confidence}%`;
+    document.getElementById('diseaseRemedy').innerText = data.remedy;
+    
+    // Ratios
+    document.getElementById('metricGreen').innerText = `${data.metrics.green_pct}%`;
+    document.getElementById('metricYellow').innerText = `${data.metrics.yellow_pct}%`;
+    document.getElementById('metricNecrosis').innerText = `${data.metrics.necrosis_pct}%`;
+
+    // Apply color coding based on status
+    const card = document.getElementById('diseaseResultCard');
+    if (data.status === 'optimal') {
+      card.style.borderLeftColor = '#16a34a';
+    } else if (data.status === 'warning') {
+      card.style.borderLeftColor = '#ca8a04';
+    } else {
+      card.style.borderLeftColor = '#b91c1c';
+    }
+
+    // Scroll results into view
+    card.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    console.error("Diagnosis error:", err);
+    showError(err.message || "Fungal diagnosis failed.");
+  } finally {
+    btn.disabled = false;
+    if (spinner) spinner.style.display = 'none';
+  }
+}
+
+// =======================
+// 📈 MANDI PRICES LOADER
+// =======================
+async function fetchMandiPrices() {
+  if (!isLoggedIn()) {
+    showLoginModal();
+    return;
+  }
+
+  const grid = document.getElementById('mandiPricesGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--gray-500); font-weight:600;">Loading fresh market feeds... ⏳</div>';
+
+  try {
+    const response = await fetchWithRetry(`${API_URL}/market-prices`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error("Could not retrieve market rates");
+
+    grid.innerHTML = '';
+    data.prices.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'mandi-card';
+
+      const isUp = p.trend === 'up';
+      const trendBadge = isUp 
+        ? `<span class="mandi-trend-badge trend-up">▲ UP</span>` 
+        : `<span class="mandi-trend-badge trend-down">▼ DOWN</span>`;
+
+      card.innerHTML = `
+        <div class="mandi-header">
+          <div>
+            <h3 class="mandi-commodity">${p.commodity}</h3>
+            <span class="mandi-location">${p.mandi}, ${p.state}</span>
+          </div>
+          ${trendBadge}
+        </div>
+        <div class="mandi-prices-row">
+          <div>
+            <span class="mandi-price-lbl">Average Price</span>
+            <div class="mandi-price-val">₹${p.avg}</div>
+          </div>
+          <div style="text-align: right;">
+            <span class="mandi-price-lbl">Range (Min - Max)</span>
+            <div style="font-size:0.82rem; font-weight:600; color:var(--gray-600); margin-top:2px;">₹${p.min} - ₹${p.max}</div>
+            <span style="font-size:0.65rem; color:var(--gray-400);">per quintal</span>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+  } catch (err) {
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#b91c1c; font-weight:600;">Error: ${err.message}</div>`;
+  }
+}
+
+// =======================
+// INITIALISE & REGISTER SW
+// =======================
 document.addEventListener('DOMContentLoaded', () => {
   initIndiaMap();
+
+  // Load language settings
+  const cachedLang = localStorage.getItem('cropiq_lang') || 'en';
+  changeLanguage(cachedLang);
+
+  // Drag and drop event bindings
+  const dropZone = document.getElementById('uploadZone');
+  if (dropZone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.style.background = 'var(--green-50)';
+        dropZone.style.borderColor = 'var(--green-500)';
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        dropZone.style.background = 'var(--gray-50)';
+        dropZone.style.borderColor = 'var(--green-300)';
+      }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length) {
+        handleFileSelect({ target: { files: files } });
+      }
+    }, false);
+  }
+
+  // Register Progressive Web App Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('✅ ServiceWorker registered: ', registration.scope);
+        })
+        .catch(err => {
+          console.warn('❌ ServiceWorker registration failed: ', err);
+        });
+    });
+  }
 });

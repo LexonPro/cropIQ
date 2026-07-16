@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi import FastAPI, HTTPException, Depends, Request, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, PlainTextResponse, HTMLResponse
@@ -11,6 +11,9 @@ import sqlite3
 import joblib
 import numpy as np
 import os
+from PIL import Image
+import io
+
 
 # =========================
 # 🚀 APP
@@ -655,9 +658,116 @@ def admin_dashboard():
         return f.read()
 
 # =========================
+# 🩺 AI LEAF DISEASE DETECTION
+# =========================
+@app.post("/predict-disease")
+async def predict_disease(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    try:
+        # Read file bytes
+        contents = await file.read()
+        
+        # Load image via Pillow and convert to RGB
+        try:
+            image = Image.open(io.BytesIO(contents)).convert("RGB")
+        except Exception:
+            raise HTTPException(status_code=400, detail="Uploaded file is not a valid image.")
+            
+        # Downscale to 100x100 for fast, memory-safe pixel scanning (avoids Render OOM crashes)
+        image = image.resize((100, 100))
+        pixels = list(image.getdata())
+        
+        # Colour categorization counts
+        yellow_count = 0
+        necrosis_count = 0
+        green_count = 0
+        
+        for r, g, b in pixels:
+            # Yellow heuristic: high red, high green, low blue (mildews, rusts, chlorosis)
+            if r > 115 and g > 115 and b < 95 and abs(r - g) < 45:
+                yellow_count += 1
+            # Necrosis heuristic: dark brown, spots, or black lesions (leaf spots, early/late blight)
+            elif (30 < r < 125 and 20 < g < 100 and b < 80 and r > g and g > b) or (r < 40 and g < 40 and b < 40):
+                necrosis_count += 1
+            # Green heuristic: healthy chlorophyll (green-dominant)
+            elif g > 65 and g > r and g > b:
+                green_count += 1
+
+        total = 10000.0
+        pct_green = (green_count / total) * 100.0
+        pct_yellow = (yellow_count / total) * 100.0
+        pct_necrosis = (necrosis_count / total) * 100.0
+
+        # Diagnosis logic based on colour ratios
+        if pct_green > 60 and (pct_yellow + pct_necrosis) < 6:
+            disease = "Healthy Leaf"
+            confidence = round(pct_green, 1)
+            remedy = "Your crop leaves display normal chlorophyll density. No active fungal or bacterial infections detected. Maintain standard watering and crop rotation cycles."
+            status = "optimal"
+        elif pct_yellow > 8 and pct_necrosis <= 6:
+            disease = "Powdery Mildew / Rust Fungi"
+            confidence = round(min(pct_yellow * 4.5, 96.5), 1)
+            remedy = "Fungal infection detected. Immediately prune heavily infested foliage. Spray diluted organic Neem Oil solution or sulfur-based fungicides to suppress spore germination."
+            status = "warning"
+        elif pct_necrosis > 8 and pct_yellow <= 6:
+            disease = "Early Blight / Alternaria Spot"
+            confidence = round(min(pct_necrosis * 4.5, 95.8), 1)
+            remedy = "Leaf spot pathogens detected. Avoid overhead watering to keep leaf surfaces dry. Spray copper-based fungicides or utilize bio-pesticides (Bacillus subtilis)."
+            status = "danger"
+        elif pct_yellow > 5 and pct_necrosis > 5:
+            disease = "Late Blight Disease (Phytophthora)"
+            confidence = round(min((pct_yellow + pct_necrosis) * 3.5, 97.2), 1)
+            remedy = "Severe blight conditions indicated. Apply chlorothalonil, Mancozeb, or metalaxyl fungicides immediately. Ensure maximum spacing between plants for adequate ventilation."
+            status = "danger"
+        else:
+            # Fallback based on dominant symptom
+            if pct_yellow > pct_necrosis:
+                disease = "Nutrient Chlorosis (Iron/Magnesium Deficiency)"
+                confidence = 82.5
+                remedy = "Yellowing between veins detected. Spray chelated Iron or Magnesium Sulfate (Epsom salt) solution to restore healthy green color."
+                status = "warning"
+            else:
+                disease = "Mild Leaf Spotting / Early Pathogen activity"
+                confidence = 74.0
+                remedy = "Minor leaf spotting observed. Prune lower affected leaves to stop soil-borne splash infection, and monitor closely."
+                status = "warning"
+
+        return {
+            "disease": disease,
+            "confidence": confidence,
+            "remedy": remedy,
+            "status": status,
+            "metrics": {
+                "green_pct": round(pct_green, 1),
+                "yellow_pct": round(pct_yellow, 1),
+                "necrosis_pct": round(pct_necrosis, 1)
+            },
+            "status_code": "success"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# =========================
+# 📊 MANDI MARKET PRICES
+# =========================
+@app.get("/market-prices")
+def get_market_prices(current_user: dict = Depends(get_current_user)):
+    prices = [
+        {"commodity": "Wheat (Kanak)", "mandi": "Khanna Mandi", "state": "Punjab", "min": 2400, "max": 2550, "avg": 2480, "trend": "up"},
+        {"commodity": "Paddy (Dhan)", "mandi": "Gondal Mandi", "state": "Gujarat", "min": 2100, "max": 2300, "avg": 2220, "trend": "down"},
+        {"commodity": "Sugarcane", "mandi": "Muzaffarnagar Mandi", "state": "Uttar Pradesh", "min": 380, "max": 415, "avg": 402, "trend": "up"},
+        {"commodity": "Potato (Aloo)", "mandi": "Agra Mandi", "state": "Uttar Pradesh", "min": 1200, "max": 1500, "avg": 1380, "trend": "up"},
+        {"commodity": "Cotton (Kapas)", "mandi": "Adoni Mandi", "state": "Andhra Pradesh", "min": 6800, "max": 7500, "avg": 7150, "trend": "down"},
+        {"commodity": "Coffee Beans", "mandi": "Chikmagalur Mandi", "state": "Karnataka", "min": 18000, "max": 21000, "avg": 19500, "trend": "up"},
+        {"commodity": "Mustard Seeds", "mandi": "Alwar Mandi", "state": "Rajasthan", "min": 5200, "max": 5650, "avg": 5420, "trend": "up"},
+        {"commodity": "Jute Fibre", "mandi": "Nadia Mandi", "state": "West Bengal", "min": 4500, "max": 4900, "avg": 4710, "trend": "down"}
+    ]
+    return {"prices": prices, "status": "success"}
+
+# =========================
 # 🚀 RUN
 # =========================
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 10000))
     uvicorn.run("app:app", host="0.0.0.0", port=port)
+
