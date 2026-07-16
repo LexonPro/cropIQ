@@ -983,6 +983,8 @@ function captureCameraPhoto() {
 // INITIALISE & REGISTER SW
 // =======================
 document.addEventListener('DOMContentLoaded', () => {
+  // Hide error banner on startup
+  hideError();
 
   // Load language settings
   const cachedLang = localStorage.getItem('cropiq_lang') || 'en';
