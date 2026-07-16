@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -103,36 +103,38 @@
       </a>
     </div>
     <div class="hero-visual">
-      <div class="visual-card vc-1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1M4.22 4.22l.707.707M18.364 18.364l.707.707M1 12h1M21 12h1M4.22 19.778l.707-.707M18.364 5.636l.707-.707"/><circle cx="12" cy="12" r="4"/></svg>
-        <div>
-          <div class="vc-label">Temperature</div>
-          <div class="vc-value">27.4°C</div>
+      <div class="instrument-readout-panel">
+        <div class="panel-header">
+          <span class="panel-status-dot"></span>
+          <span class="panel-title-text">SYSTEM INSTRUMENTATION v4.0.1</span>
         </div>
-      </div>
-      <div class="visual-card vc-2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
-        <div>
-          <div class="vc-label">Humidity</div>
-          <div class="vc-value">72%</div>
+        <div class="panel-grid">
+          <div class="panel-item">
+            <span class="panel-item-label">SOIL HEALTH</span>
+            <span class="panel-item-value value-mono">OPTIMAL</span>
+          </div>
+          <div class="panel-item">
+            <span class="panel-item-label">WEATHER FEED</span>
+            <span class="panel-item-value value-mono">27.4°C / 72%</span>
+          </div>
+          <div class="panel-item">
+            <span class="panel-item-label">NPK CONC.</span>
+            <span class="panel-item-value value-mono">90 - 42 - 43</span>
+          </div>
+          <div class="panel-item">
+            <span class="panel-item-label">ACCURACY</span>
+            <span class="panel-item-value value-mono">98.42%</span>
+          </div>
+          <div class="panel-item">
+            <span class="panel-item-label">SENSOR STABILITY</span>
+            <span class="panel-item-value value-mono">ACTIVE (100%)</span>
+          </div>
         </div>
-      </div>
-      <div class="visual-card vc-3">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <div>
-          <div class="vc-label">Best Match</div>
-          <div class="vc-value">Rice 94%</div>
+        <div class="panel-footer-blueprint">
+          <svg class="blueprint-vector" viewBox="0 0 100 20">
+            <path d="M0,10 L30,10 L35,5 L40,15 L45,10 L100,10" stroke="rgba(242, 167, 59, 0.4)" stroke-width="1.5" fill="none"/>
+          </svg>
         </div>
-      </div>
-      <div class="visual-ring"></div>
-      <div class="visual-center-icon">
-        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="32" cy="32" r="32" fill="var(--green-100)"/>
-          <path d="M32 14C32 14 20 24 20 34C20 40.627 25.373 46 32 46C38.627 46 44 40.627 44 34C44 24 32 14 32 14Z" fill="var(--green-500)" opacity="0.7"/>
-          <path d="M32 22V46" stroke="var(--green-800)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M32 34L26 28" stroke="var(--green-800)" stroke-width="2" stroke-linecap="round"/>
-          <path d="M32 38L38 32" stroke="var(--green-800)" stroke-width="2" stroke-linecap="round"/>
-        </svg>
       </div>
     </div>
   </section>
@@ -150,7 +152,8 @@
     <!-- Soil Advisor Tab Content Wrapper -->
     <div id="soilTabContent" class="tab-content">
       <div class="container">
-      <div class="section-label">Step 01 — Input Parameters</div>
+        <div class="soil-strata-marker"></div>
+        <div class="section-label">Step 01 — Input Parameters</div>
       <h2 class="section-title">Enter Soil & Climate Data</h2>
       <p class="section-sub">Provide your soil nutrient levels and current climate conditions for accurate crop recommendations.</p>
 
@@ -335,6 +338,7 @@
 
     <!-- ======================== RESULTS ======================== -->
     <div class="container results-container" id="results" style="display:none;">
+      <div class="soil-strata-marker"></div>
 
       <!-- Success Banner -->
       <div class="success-banner" id="successBanner">
@@ -353,6 +357,7 @@
 
       <!-- NPK Target Prescription Cards -->
       <div class="advisory-card-wrap" id="advisoryWrap" style="display:none; margin-top:40px; margin-bottom:40px;">
+        <div class="soil-strata-marker"></div>
         <div class="section-label">Step 03 — Agronomical Prescriptions</div>
         <h2 class="section-title">AI Soil Diagnostics & Prescription Advisory</h2>
         <p class="section-sub">Computed balanced mineral target thresholds and calculated customized fertilizer recipe cards for optimal growth.</p>
@@ -382,6 +387,7 @@
     <!-- ======================== LEAF DIAGNOSIS TAB ======================== -->
     <div id="diseaseTabContent" class="tab-content" style="display: none;">
       <div class="container">
+        <div class="soil-strata-marker"></div>
         <div class="section-label" id="lblStepDisease">Step 01 — Leaf Upload</div>
         <h2 class="section-title" id="lblTitleDisease">AI Leaf Disease Diagnosis</h2>
         <p class="section-sub" id="lblSubDisease">Upload a clear photo of the infected crop leaf or snap a picture using your camera for instant diagnosis and treatments.</p>
@@ -452,6 +458,7 @@
     <!-- ======================== MANDI PRICES TAB ======================== -->
     <div id="mandiTabContent" class="tab-content" style="display: none;">
       <div class="container">
+        <div class="soil-strata-marker"></div>
         <div class="section-label" id="lblStepMandi">Step 01 — Market Feeds</div>
         <h2 class="section-title" id="lblTitleMandi">Mandi Market Prices (Live Trends)</h2>
         <p class="section-sub" id="lblSubMandi">View wholesale commodity rates in regional markets (Mandis) of India to negotiate the best price for your produce.</p>

@@ -263,7 +263,7 @@ function renderChart(predictions) {
       datasets: [{
         label:           'Match %',
         data:            predictions.map(p => Math.round(p.confidence * 100)),
-        backgroundColor: ['#2e7d32', '#66bb6a', '#a5d6a7'],
+        backgroundColor: ['#22405C', '#F2A73B', '#6B4226'],
       }]
     }
   });
@@ -527,7 +527,7 @@ function renderAdvisory(advisory) {
           <span>${targetText}</span>
         </div>
         <div style="height:6px; background:var(--gray-100); border-radius:100px; overflow:hidden; position:relative;">
-          <div style="width: ${item.status === 'optimal' ? '100%' : '65%'}; height: 100%; background:${item.status === 'optimal' ? '#22c55e' : '#f59e0b'}; opacity: 0.8; border-radius:100px;"></div>
+          <div style="width: ${item.status === 'optimal' ? '100%' : '65%'}; height: 100%; background:${item.status === 'optimal' ? 'var(--leaf-500)' : 'var(--marigold-500)'}; opacity: 0.8; border-radius:100px;"></div>
         </div>
       </div>
       <p style="font-size:0.83rem; color:var(--gray-600); line-height:1.5; margin:0; font-weight:500;">${item.message}</p>
