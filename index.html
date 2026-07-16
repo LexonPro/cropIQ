@@ -392,10 +392,19 @@
         <h2 class="section-title" id="lblTitleDisease">AI Leaf Disease Diagnosis</h2>
         <p class="section-sub" id="lblSubDisease">Upload a clear photo of the infected crop leaf or snap a picture using your camera for instant diagnosis and treatments.</p>
         
+        <!-- Camera Stream Viewport -->
+        <div id="cameraContainer" style="display:none; flex-direction:column; align-items:center; gap:16px; margin-bottom:24px; border:2px solid var(--indigo-900); border-radius:var(--radius-md); padding:20px; background:var(--parchment-100);">
+          <video id="cameraVideo" autoplay playsinline style="width:100%; max-width:440px; height:auto; border-radius:var(--radius-sm); border:2px solid var(--indigo-900); background:#000;"></video>
+          <div style="display:flex; gap:12px;">
+            <button class="btn-predict" id="captureBtn" onclick="captureCameraPhoto()">Capture Frame</button>
+            <button class="btn-reset" onclick="stopCameraStream()">Close Camera</button>
+          </div>
+        </div>
+
         <div class="form-card" style="position:relative; margin-bottom: 40px; padding: 40px;">
           <!-- Drag and drop zone -->
-          <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()" style="border: 2px dashed var(--green-300); border-radius: var(--radius-lg); padding: 40px 20px; text-align: center; background: var(--gray-50); cursor: pointer; transition: background 0.2s, border-color 0.2s;">
-            <div class="upload-icon-wrap" style="display: flex; justify-content: center; margin-bottom: 16px; color: var(--green-600);">
+          <div class="upload-zone" id="uploadZone" onclick="triggerFileInput()">
+            <div class="upload-icon-wrap" style="display: flex; justify-content: center; margin-bottom: 16px; color: var(--indigo-700);">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:48px; height:48px; stroke-linecap:round; stroke-linejoin:round;">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
               </svg>
@@ -403,6 +412,14 @@
             <h4 id="lblUploadClick" style="font-family: var(--font-display); font-weight: 700; color: var(--gray-800); font-size: 1.05rem; margin-bottom: 6px;">Click or Drag & Drop Leaf Image Here</h4>
             <p id="lblUploadFormats" style="font-size: 0.78rem; color: var(--gray-400);">Supports JPG, PNG (Max 5MB)</p>
             <input type="file" id="diseaseFile" accept="image/*" style="display:none;" onchange="handleFileSelect(event)" />
+          </div>
+
+          <!-- Start Web Camera option -->
+          <div style="display:flex; justify-content:center; margin-top:20px;">
+            <button class="btn-predict" onclick="startCameraStream()" style="height:36px; padding:0 16px; font-size:0.8rem; box-shadow:none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; stroke-linecap:round; stroke-linejoin:round;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Start Web Camera
+            </button>
           </div>
 
           <!-- Image Preview Area -->

@@ -910,6 +910,70 @@ async function fetchMandiPrices() {
 }
 
 // =======================
+// 📷 WEB CAMERA STREAM CONTROLLER
+// =======================
+let activeVideoStream = null;
+
+function startCameraStream() {
+  const container = document.getElementById('cameraContainer');
+  const video = document.getElementById('cameraVideo');
+  if (!container || !video) return;
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => {
+      activeVideoStream = stream;
+      video.srcObject = stream;
+      container.style.display = 'flex';
+      container.scrollIntoView({ behavior: 'smooth' });
+    })
+    .catch(err => {
+      console.error("Camera access failed:", err);
+      showError("Camera access blocked or unavailable. Please upload a file instead.");
+    });
+}
+
+function stopCameraStream() {
+  const container = document.getElementById('cameraContainer');
+  const video = document.getElementById('cameraVideo');
+  if (video) video.srcObject = null;
+  if (activeVideoStream) {
+    activeVideoStream.getTracks().forEach(track => track.stop());
+    activeVideoStream = null;
+  }
+  if (container) container.style.display = 'none';
+}
+
+function captureCameraPhoto() {
+  const video = document.getElementById('cameraVideo');
+  if (!video || !activeVideoStream) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  canvas.toBlob(blob => {
+    if (!blob) return;
+
+    const capturedFile = new File([blob], "captured_leaf.jpg", { type: "image/jpeg" });
+    selectedDiseaseFile = capturedFile;
+
+    const preview = document.getElementById('leafPreview');
+    const previewArea = document.getElementById('previewArea');
+    if (preview && previewArea) {
+      preview.src = URL.createObjectURL(capturedFile);
+      previewArea.style.display = 'block';
+    }
+
+    stopCameraStream();
+    submitDiseaseDiagnosis();
+
+  }, 'image/jpeg', 0.95);
+}
+
+// =======================
 // INITIALISE & REGISTER SW
 // =======================
 document.addEventListener('DOMContentLoaded', () => {
