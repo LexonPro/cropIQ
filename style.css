@@ -764,29 +764,47 @@ img, svg { display: block; }
   animation: fadeUp 0.6s ease both;
 }
 
-.recomm-grid {
+.results-split-wrapper {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-top: 30px;
   margin-bottom: 30px;
 }
 
-.recomm-card {
+@media (min-width: 769px) {
+  .results-split-wrapper {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: stretch;
+  }
+}
+
+.prediction-grid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.pred-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 20px 24px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   transition: border-color var(--transition);
 }
 
-.recomm-card:hover {
+.pred-card:hover {
   border-color: var(--marigold-500);
 }
 
-/* Rank Border top left */
-.recomm-card::before {
+/* Color indicator bar on the left */
+.pred-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -794,84 +812,58 @@ img, svg { display: block; }
   width: 4px;
   height: 100%;
 }
-.recomm-card.rank-0::before { background: var(--marigold-500); }
-.recomm-card.rank-1::before { background: var(--indigo-700); }
-.recomm-card.rank-2::before { background: var(--soil-700); }
+.pred-card.rank-1::before { background: var(--marigold-500); }
+.pred-card.rank-2::before { background: var(--indigo-700); }
+.pred-card.rank-3::before { background: var(--soil-700); }
 
-.recomm-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.recomm-crop {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--ink-900);
-}
-
-.recomm-score {
+.pred-rank-badge {
   background: var(--parchment-100);
   color: var(--indigo-900);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--gray-200);
+  align-self: flex-start;
 }
 
-/* Progress bar inside card */
-.recomm-confidence-wrapper {
-  margin-bottom: 16px;
+.pred-crop-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--ink-900);
+  text-transform: uppercase;
 }
 
-.recomm-conf-lbl {
-  display: flex;
-  justify-content: space-between;
+.pred-label {
   font-size: 0.72rem;
-  font-weight: 700;
   color: var(--gray-500);
-  margin-bottom: 4px;
-}
-.recomm-conf-lbl span:last-child {
-  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.recomm-conf-bar {
-  height: 5px;
+.pred-confidence-val {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--indigo-900);
+}
+
+.pred-bar-track {
+  height: 6px;
   background: var(--gray-100);
   border-radius: 100px;
   overflow: hidden;
+  margin-top: 4px;
 }
 
-.recomm-conf-fill {
+.pred-bar-fill {
   height: 100%;
   background: var(--marigold-500);
   border-radius: 100px;
-  transition: width 1s ease-out;
-}
-
-.recomm-details {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  border-top: 1px dashed var(--gray-200);
-  padding-top: 12px;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: var(--gray-600);
-}
-.detail-row span:last-child {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--ink-900);
+  transition: width 1.2s ease-out;
 }
 
 .chart-card {
@@ -880,7 +872,9 @@ img, svg { display: block; }
   border-radius: var(--radius-md);
   padding: 28px;
   box-shadow: var(--shadow-sm);
-  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* ---------- ADVISORY prescription cards ---------- */

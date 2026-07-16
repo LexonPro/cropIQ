@@ -350,9 +350,26 @@
       <h2 class="section-title">Top 3 Crop Predictions</h2>
       <p class="section-sub">Based on your soil and climate data, our AI model recommends the following crops.</p>
 
-      <!-- Prediction Cards -->
-      <div class="prediction-grid" id="predictionGrid">
-        <!-- Injected by JS -->
+      <!-- Results Split Grid (Cards + Chart side-by-side) -->
+      <div class="results-split-wrapper">
+        <!-- Prediction Cards -->
+        <div class="prediction-grid" id="predictionGrid">
+          <!-- Injected by JS -->
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-card" style="margin-bottom: 0;">
+          <div class="chart-header">
+            <div>
+              <div class="section-label" style="margin-bottom:4px; text-align: left;">Confidence Analysis</div>
+              <h3 class="chart-title" style="font-family: var(--font-display); font-weight:800; font-size:1.25rem; color: var(--ink-900);">Prediction Confidence Chart</h3>
+            </div>
+            <div class="chart-legend" id="chartLegend"></div>
+          </div>
+          <div class="chart-wrap" style="position: relative; height: 260px;">
+            <canvas id="cropChart"></canvas>
+          </div>
+        </div>
       </div>
 
       <!-- NPK Target Prescription Cards -->
@@ -364,20 +381,6 @@
         
         <div class="advisory-grid" id="advisoryGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:24px; margin-top:20px;">
           <!-- Injected dynamically by JS -->
-        </div>
-      </div>
-
-      <!-- Chart -->
-      <div class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="section-label" style="margin-bottom:4px">Confidence Analysis</div>
-            <h3 class="chart-title">Prediction Confidence Chart</h3>
-          </div>
-          <div class="chart-legend" id="chartLegend"></div>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="cropChart"></canvas>
         </div>
       </div>
 
