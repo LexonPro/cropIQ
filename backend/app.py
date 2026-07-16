@@ -122,9 +122,9 @@ class LoginInput(BaseModel):
     password: str
 
 class CropInput(BaseModel):
-    N:           float = Field(..., ge=0, le=150)
-    P:           float = Field(..., ge=0, le=150)
-    K:           float = Field(..., ge=0, le=150)
+    N:           float = Field(..., ge=0, le=300)
+    P:           float = Field(..., ge=0, le=300)
+    K:           float = Field(..., ge=0, le=300)
     temperature: float = Field(..., ge=0, le=60)
     humidity:    float = Field(..., ge=0, le=100)
     ph:          float = Field(..., ge=0, le=14)
