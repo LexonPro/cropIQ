@@ -1042,51 +1042,148 @@ img, svg { display: block; }
   z-index: 2;
 }
 
-#mandiTabContent .mandi-card {
-  background: rgba(28, 23, 18, 0.5) !important;
-  border: 1px solid rgba(251, 247, 238, 0.12) !important;
-  color: var(--parchment-50) !important;
-  box-shadow: none !important;
-  border-radius: var(--radius-sm) !important;
+#mandiPricesGrid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(251, 247, 238, 0.12);
+}
+
+#mandiTabContent .form-card > div:first-child {
+  border-bottom: 1.5px dashed rgba(251, 247, 238, 0.15) !important;
+  padding-bottom: 16px !important;
+}
+
+#mandiTabContent .form-card > div:first-child span {
+  color: var(--marigold-500) !important;
   font-family: var(--font-mono) !important;
+  letter-spacing: 0.08em !important;
+}
+
+#mandiTabContent .mandi-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  background: rgba(28, 23, 18, 0.25) !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(251, 247, 238, 0.1) !important;
+  padding: 18px 24px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  gap: 20px !important;
+  font-family: var(--font-mono) !important;
+  transition: background var(--transition) !important;
+}
+
+#mandiTabContent .mandi-card:last-child {
+  border-bottom: none !important;
 }
 
 #mandiTabContent .mandi-card:hover {
-  border-color: var(--marigold-500) !important;
+  background: rgba(251, 247, 238, 0.05) !important;
+}
+
+#mandiTabContent .mandi-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  width: 50% !important;
 }
 
 #mandiTabContent .mandi-commodity {
   font-family: var(--font-display) !important;
   font-weight: 700 !important;
   color: var(--parchment-50) !important;
-  font-size: 1.1rem !important;
+  font-size: 1.15rem !important;
+  margin-bottom: 2px !important;
 }
 
 #mandiTabContent .mandi-location {
   color: var(--parchment-100) !important;
-  opacity: 0.7;
+  opacity: 0.75;
+}
+
+#mandiTabContent .mandi-prices-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 50% !important;
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  gap: 16px !important;
+}
+
+#mandiTabContent .mandi-prices-row > div:first-child {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#mandiTabContent .mandi-prices-row > div:last-child {
+  text-align: right !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+#mandiTabContent .mandi-prices-row div {
+  color: var(--parchment-100) !important;
+}
+
+#mandiTabContent .mandi-prices-row span {
+  color: var(--parchment-50) !important;
+  opacity: 0.6;
+}
+
+#mandiTabContent .mandi-price-lbl {
+  font-size: 0.7rem !important;
+  text-transform: uppercase !important;
+  margin-bottom: 2px !important;
 }
 
 #mandiTabContent .mandi-price-val {
   color: var(--marigold-500) !important;
   font-family: var(--font-mono) !important;
   font-weight: 700 !important;
-}
-
-#mandiTabContent .mandi-prices-row {
-  border-top: 1.5px dashed rgba(251, 247, 238, 0.12) !important;
+  font-size: 1.25rem !important;
 }
 
 #mandiTabContent .mandi-trend-badge.trend-up {
   background: rgba(76, 122, 63, 0.2) !important;
   color: #a7f3d0 !important;
   border: 1px solid rgba(76, 122, 63, 0.4) !important;
+  order: 2;
 }
 
 #mandiTabContent .mandi-trend-badge.trend-down {
   background: rgba(239, 68, 68, 0.2) !important;
   color: #fca5a5 !important;
   border: 1px solid rgba(239, 68, 68, 0.4) !important;
+  order: 2;
+}
+
+@media (max-width: 680px) {
+  #mandiTabContent .mandi-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 16px !important;
+    gap: 12px !important;
+  }
+  #mandiTabContent .mandi-header,
+  #mandiTabContent .mandi-prices-row {
+    width: 100% !important;
+  }
+  #mandiTabContent .mandi-prices-row {
+    border-top: 1px dashed rgba(251, 247, 238, 0.15) !important;
+    padding-top: 12px !important;
+    text-align: left !important;
+  }
+  #mandiTabContent .mandi-prices-row > div:last-child {
+    text-align: left !important;
+  }
 }
 
 /* ---------- FOOTER ---------- */
