@@ -287,11 +287,17 @@ function setLoading(isLoading) {
 // ❌ ERROR HANDLING
 // =======================
 function showError(msg) {
-  document.getElementById('errorMessage').innerText = msg;
+  const msgEl = document.getElementById('errorMessage');
+  const banner = document.getElementById('errorBanner');
+  if (msgEl) msgEl.innerText = msg;
+  if (banner) banner.style.display = 'flex';
 }
 
 function hideError() {
-  document.getElementById('errorMessage').innerText = '';
+  const msgEl = document.getElementById('errorMessage');
+  const banner = document.getElementById('errorBanner');
+  if (msgEl) msgEl.innerText = '';
+  if (banner) banner.style.display = 'none';
 }
 
 // =======================
