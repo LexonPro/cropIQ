@@ -141,10 +141,9 @@ class CropInput(BaseModel):
 # =========================
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc):
-    print("❌ Validation error:", exc.errors())
     return JSONResponse(
         status_code=422,
-        content={"status": "error", "message": f"Invalid input. Errors: {exc.errors()}"}
+        content={"status": "error", "message": "Invalid input. Please check values."}
     )
 
 # =========================
