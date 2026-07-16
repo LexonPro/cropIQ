@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#16a34a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="stylesheet" href="style.css?v=4.0.4" />
+  <link rel="stylesheet" href="style.css?v=4.0.5" />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
@@ -221,7 +221,7 @@
               <input type="number" id="nitrogen" name="nitrogen" placeholder="e.g. 90" min="0" max="300" step="0.1" />
               <span class="unit-badge">mg/kg</span>
             </div>
-            <span class="field-hint">Typical range: 0 – 300</span>
+            <span class="field-hint" id="hintN">Typical range: 0 – 300</span>
           </div>
 
           <!-- P -->
@@ -234,7 +234,7 @@
               <input type="number" id="phosphorus" name="phosphorus" placeholder="e.g. 42" min="0" max="300" step="0.1" />
               <span class="unit-badge">mg/kg</span>
             </div>
-            <span class="field-hint">Typical range: 0 – 300</span>
+            <span class="field-hint" id="hintP">Typical range: 0 – 300</span>
           </div>
 
           <!-- K -->
@@ -247,7 +247,7 @@
               <input type="number" id="potassium" name="potassium" placeholder="e.g. 43" min="0" max="300" step="0.1" />
               <span class="unit-badge">mg/kg</span>
             </div>
-            <span class="field-hint">Typical range: 0 – 300</span>
+            <span class="field-hint" id="hintK">Typical range: 0 – 300</span>
           </div>
 
           <!-- Temperature -->
@@ -262,7 +262,7 @@
               <input type="number" id="temperature" name="temperature" placeholder="e.g. 20.9" min="-10" max="55" step="0.1" />
               <span class="unit-badge">°C</span>
             </div>
-            <span class="field-hint">Typical range: -10 – 55°C</span>
+            <span class="field-hint" id="hintTemp">Typical range: -10 – 55°C</span>
           </div>
 
           <!-- Humidity -->
@@ -277,7 +277,7 @@
               <input type="number" id="humidity" name="humidity" placeholder="e.g. 82" min="0" max="100" step="0.1" />
               <span class="unit-badge">%</span>
             </div>
-            <span class="field-hint">Typical range: 0 – 100%</span>
+            <span class="field-hint" id="hintHum">Typical range: 0 – 100%</span>
           </div>
 
           <!-- pH -->
@@ -290,7 +290,7 @@
               <input type="number" id="ph" name="ph" placeholder="e.g. 6.5" min="0" max="14" step="0.01" />
               <span class="unit-badge">0–14</span>
             </div>
-            <span class="field-hint">Typical range: 3.5 – 9.0</span>
+            <span class="field-hint" id="hintPh">Typical range: 3.5 – 9.0</span>
           </div>
 
           <!-- Rainfall -->
@@ -305,7 +305,7 @@
               <input type="number" id="rainfall" name="rainfall" placeholder="e.g. 202" min="0" max="4000" step="0.1" />
               <span class="unit-badge">mm</span>
             </div>
-            <span class="field-hint">Typical range: 20 – 3000 mm</span>
+            <span class="field-hint" id="hintRain">Typical range: 20 – 3000 mm</span>
           </div>
 
         </div>
@@ -419,9 +419,9 @@
 
           <!-- Start Web Camera option -->
           <div style="display:flex; justify-content:center; margin-top:20px;">
-            <button class="btn-predict" onclick="startCameraStream()" style="height:36px; padding:0 16px; font-size:0.8rem; box-shadow:none;">
+            <button class="btn-predict" id="webcamBtn" onclick="startCameraStream()" style="height:36px; padding:0 16px; font-size:0.8rem; box-shadow:none; display:inline-flex; align-items:center; gap:8px;">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px; height:14px; stroke-linecap:round; stroke-linejoin:round;"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-              Start Web Camera
+              <span id="webcamBtnText">Start Web Camera</span>
             </button>
           </div>
 
@@ -555,9 +555,9 @@
 
 
 
-  <link rel="stylesheet" href="auth.css?v=4.0.4" />
-  <script src="auth-gate.js?v=4.0.4"></script>
+  <link rel="stylesheet" href="auth.css?v=4.0.5" />
+  <script src="auth-gate.js?v=4.0.5"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="script.js?v=4.0.4"></script>
+  <script src="script.js?v=4.0.5"></script>
 </body>
 </html>

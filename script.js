@@ -621,9 +621,51 @@ function speakText(elementId) {
   window.speechSynthesis.speak(utterance);
 }
 
-// =======================
-// 🌐 MULTILINGUAL SYSTEM
-// =======================
+const COMMODITY_TRANSLATIONS = {
+  en: {
+    "wheat": "Wheat", "rice": "Rice", "maize": "Maize", "cotton": "Cotton",
+    "potato": "Potato", "onion": "Onion", "mango": "Mango", "orange": "Orange",
+    "pigeonpeas": "Pigeon Peas", "tomato": "Tomato", "jute": "Jute",
+    "soyabean": "Soyabean", "mustard": "Mustard", "gram": "Gram", "lentil": "Lentil"
+  },
+  hi: {
+    "wheat": "गेहूं", "rice": "चावल", "maize": "मक्का", "cotton": "कपास",
+    "potato": "आलू", "onion": "प्याज", "mango": "आम", "orange": "संतरा",
+    "pigeonpeas": "अरहर", "tomato": "टमाटर", "jute": "पटसन",
+    "soyabean": "सोयाबीन", "mustard": "सरसों", "gram": "चना", "lentil": "मसूर"
+  },
+  pb: {
+    "wheat": "ਕਣਕ", "rice": "ਚੌਲ", "maize": "ਮੱਕੀ", "cotton": "ਕਪਾਹ",
+    "potato": "ਆਲੂ", "onion": "ਪਿਆਜ਼", "mango": "ਅੰਬ", "orange": "ਸੰਤਰਾ",
+    "pigeonpeas": "ਅਰਹਰ", "tomato": "ਟਮਾਟਰ", "jute": "ਪਟਸਨ",
+    "soyabean": "ਸੋਆਬੀਨ", "mustard": "ਸਰ੍ਹੋਂ", "gram": "ਚਨਾ", "lentil": "ਮਸਰ"
+  }
+};
+
+const LOCATION_TRANSLATIONS = {
+  en: {
+    "surat": "Surat", "gujarat": "Gujarat", "mumbai": "Mumbai", "maharashtra": "Maharashtra",
+    "amritsar": "Amritsar", "punjab": "Punjab", "karnal": "Karnal", "haryana": "Haryana",
+    "kanpur": "Kanpur", "uttar pradesh": "Uttar Pradesh", "jaipur": "Jaipur", "rajasthan": "Rajasthan",
+    "indore": "Indore", "madhya pradesh": "Madhya Pradesh", "kolkata": "Kolkata", "west bengal": "West Bengal",
+    "bangalore": "Bangalore", "karnataka": "Karnataka", "pune": "Pune", "lucknow": "Lucknow"
+  },
+  hi: {
+    "surat": "सूरत", "gujarat": "गुजरात", "mumbai": "मुंबई", "maharashtra": "महाराष्ट्र",
+    "amritsar": "अमृतसर", "punjab": "पंजाब", "karnal": "करनाल", "haryana": "हरियाणा",
+    "kanpur": "कानपुर", "uttar pradesh": "उत्तर प्रदेश", "jaipur": "जयपुर", "rajasthan": "राजस्थान",
+    "indore": "इंदौर", "madhya pradesh": "मध्य प्रदेश", "kolkata": "कोलकाता", "west bengal": "पश्चिम बंगाल",
+    "bangalore": "बेंगलुरु", "karnataka": "कर्नाटक", "pune": "पुणे", "lucknow": "लखनऊ"
+  },
+  pb: {
+    "surat": "ਸੂਰਤ", "gujarat": "ਗੁਜਰਾਤ", "mumbai": "ਮੁੰਬਈ", "maharashtra": "ਮਹਾਰਾਸ਼ਟਰ",
+    "amritsar": "ਅੰਮ੍ਰਿਤਸਰ", "punjab": "ਪੰਜਾਬ", "karnal": "ਕਰਨਾਲ", "haryana": "ਹਰਿਆਣਾ",
+    "kanpur": "ਕਾਨਪੁਰ", "uttar pradesh": "ਉੱਤਰ ਪ੍ਰਦੇਸ਼", "jaipur": "ਜੈਪੁਰ", "rajasthan": "ਰਾਜਸਥਾਨ",
+    "indore": "ਇੰਦੌਰ", "madhya pradesh": "ਮੱਧ ਪ੍ਰਦੇਸ਼", "kolkata": "ਕੋਲਕਾਤਾ", "west bengal": "ਪੱਛਮੀ ਬੰਗਾਲ",
+    "bangalore": "ਬੈਂਗਲੁਰੂ", "karnataka": "ਕਰਨਾਲ", "pune": "ਪੁਣੇ", "lucknow": "ਲਖਨਊ"
+  }
+};
+
 const TRANSLATIONS = {
   en: {
     title: "Enter Soil & Climate Data",
@@ -650,7 +692,22 @@ const TRANSLATIONS = {
     lbl_upload_formats: "Supports JPG, PNG (Max 5MB)",
     lbl_step_mandi: "Step 01 — Market Feeds",
     lbl_title_mandi: "Mandi Market Prices (Live Trends)",
-    lbl_sub_mandi: "View wholesale commodity rates in regional markets (Mandis) of India to negotiate the best price for your produce."
+    lbl_sub_mandi: "View wholesale commodity rates in regional markets (Mandis) of India to negotiate the best price for your produce.",
+    btn_webcam: "Start Web Camera",
+    hint_n: "Typical range: 0 – 300",
+    hint_p: "Typical range: 0 – 300",
+    hint_k: "Typical range: 0 – 300",
+    hint_temp: "Typical range: -10 – 55°C",
+    hint_hum: "Typical range: 0 – 100%",
+    hint_ph: "Typical range: 3.5 – 9.0",
+    hint_rain: "Typical range: 20 – 3000 mm",
+    placeholder_n: "e.g. 90",
+    placeholder_p: "e.g. 42",
+    placeholder_k: "e.g. 43",
+    placeholder_temp: "e.g. 20.9",
+    placeholder_hum: "e.g. 82",
+    placeholder_ph: "e.g. 6.5",
+    placeholder_rain: "e.g. 202"
   },
   hi: {
     title: "मिट्टी और जलवायु का विवरण भरें",
@@ -677,7 +734,22 @@ const TRANSLATIONS = {
     lbl_upload_formats: "JPG, PNG फाइलों का समर्थन (अधिकतम 5MB)",
     lbl_step_mandi: "चरण 01 — बाजार भाव",
     lbl_title_mandi: "मंडी बाजार भाव (ताजा जानकारी)",
-    lbl_sub_mandi: "अपनी उपज का सर्वोत्तम मूल्य प्राप्त करने के लिए भारत के क्षेत्रीय बाजारों (मंडियों) में थोक दरों को देखें।"
+    lbl_sub_mandi: "अपनी उपज का सर्वोत्तम मूल्य प्राप्त करने के लिए भारत के क्षेत्रीय बाजारों (मंडियों) में थोक दरों को देखें।",
+    btn_webcam: "वेब कैमरा शुरू करें",
+    hint_n: "सामान्य सीमा: 0 – 300",
+    hint_p: "सामान्य सीमा: 0 – 300",
+    hint_k: "सामान्य सीमा: 0 – 300",
+    hint_temp: "सामान्य सीमा: -10 – 55°C",
+    hint_hum: "सामान्य सीमा: 0 – 100%",
+    hint_ph: "सामान्य सीमा: 3.5 – 9.0",
+    hint_rain: "सामान्य सीमा: 20 – 3000 mm",
+    placeholder_n: "जैसे: 90",
+    placeholder_p: "जैसे: 42",
+    placeholder_k: "जैसे: 43",
+    placeholder_temp: "जैसे: 20.9",
+    placeholder_hum: "जैसे: 82",
+    placeholder_ph: "जैसे: 6.5",
+    placeholder_rain: "जैसे: 202"
   },
   pb: {
     title: "ਮਿੱਟੀ ਅਤੇ ਜਲਵਾਯੂ ਦਾ ਵੇਰਵਾ ਭਰੋ",
@@ -693,7 +765,7 @@ const TRANSLATIONS = {
     results_sub: "ਤੁਹਾਡੀ ਮਿੱਟੀ ਅਤੇ ਜਲਵਾਯੂ ਦੇ ਅੰਕੜਿਆਂ ਦੇ ਅਧਾਰ ਤੇ, ਸਾਡਾ ਏਆਈ ਮਾਡਲ ਇਹਨਾਂ ਫਸਲਾਂ ਦੀ ਸਿਫਾਰਸ਼ ਕਰਦਾ ਹੈ।",
     advisory_step: "ਕਦਮ 03 — ਖੇਤੀਬਾੜੀ ਨੁਸਖੇ",
     advisory_title: "ਏਆਈ ਮਿੱਟੀ ਦੀ ਜਾਂਚ ਅਤੇ ਖਾਦ ਸਲਾਹਕਾਰ",
-    advisory_sub: "ਵਧੀਆ ਵਿਕਾਸ ਲਈ ਸੰਤੁਲਿਤ ਖਣਿਜ ਟੀਚੇ ਦੇ ਪੱਧਰ ਅਤੇ ਅਨੁਕੂਲਿਤ ਖਾਦ ਦੀ ਖੁਰਾਕ ਦੀ ਗਣਨਾ ਕੀਤੀ ਗਈ।",
+    advisory_sub: "ਵਧੀਆ ਵਿਕਾਸ ਲਈ ਸੰਤੁਲਿਤ ਖਣਿਜ ਟੀਚੇ ਦੇ ਪੱਧਰ ਅਤੇ ਅਨੁਕੂਲਿਤ ਖਾਦ ਦੀ ਗਣਨਾ ਕੀਤੀ ਗਈ।",
     soil_tab: "🌱 ਮਿੱਟੀ ਸਲਾਹਕਾਰ",
     disease_tab: "🔍 ਪੱਤੇ ਦੇ ਰੋਗਾਂ ਦੀ ਜਾਂਚ",
     mandi_tab: "📈 ਮੰਡੀ ਦੇ ਭਾਅ",
@@ -704,9 +776,34 @@ const TRANSLATIONS = {
     lbl_upload_formats: "JPG, PNG ਫਾਈਲਾਂ ਦਾ ਸਮਰਥਨ (ਅਧਿਕਤਮ 5MB)",
     lbl_step_mandi: "ਕਦਮ 01 — ਬਾਜ਼ਾਰ ਦੇ ਭਾਅ",
     lbl_title_mandi: "ਮੰਡੀ ਬਾਜ਼ਾਰ ਦੇ ਭਾਅ (ਤਾਜ਼ਾ ਜਾਣਕਾਰੀ)",
-    lbl_sub_mandi: "ਆਪਣੀ ਫਸਲ ਦਾ ਸਭ ਤੋਂ ਵਧੀਆ ਮੁੱਲ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਭਾਰਤ ਦੇ ਖੇਤਰੀ ਬਾਜ਼ਾਰਾਂ (ਮੰਡੀਆਂ) ਦੇ ਥੋਕ ਭਾਅ ਦੇਖੋ।"
+    lbl_sub_mandi: "ਆਪਣੀ ਫਸਲ ਦਾ ਸਭ ਤੋਂ ਵਧੀਆ ਮੁੱਲ ਪ੍ਰਾਪਤ ਕਰਨ ਲਈ ਭਾਰਤ ਦੇ ਖੇਤਰੀ ਬਾਜ਼ਾਰਾਂ (ਮੰਡੀਆਂ) ਦੇ ਥੋਕ ਭਾਅ ਦੇਖੋ।",
+    btn_webcam: "ਵੈੱਬ ਕੈਮਰਾ ਸ਼ੁਰੂ ਕਰੋ",
+    hint_n: "ਆਮ ਰੇਂਜ: 0 – 300",
+    hint_p: "ਆਮ ਰੇਂਜ: 0 – 300",
+    hint_k: "ਆਮ ਰੇਂਜ: 0 – 300",
+    hint_temp: "ਆਮ ਰੇਂਜ: -10 – 55°C",
+    hint_hum: "ਆਮ ਰੇਂਜ: 0 – 100%",
+    hint_ph: "ਆਮ ਰੇਂਜ: 3.5 – 9.0",
+    hint_rain: "ਆਮ ਰੇਂਜ: 20 – 3000 mm",
+    placeholder_n: "ਜਿਵੇਂ: 90",
+    placeholder_p: "ਜਿਵੇਂ: 42",
+    placeholder_k: "ਜਿਵੇਂ: 43",
+    placeholder_temp: "ਜਿਵੇਂ: 20.9",
+    placeholder_hum: "ਜਿਵੇਂ: 82",
+    placeholder_ph: "ਜਿਵੇਂ: 6.5",
+    placeholder_rain: "ਜਿਵੇਂ: 202"
   }
 };
+
+function getTranslatedCommodity(name, lang) {
+  const normalized = String(name).trim().toLowerCase();
+  return COMMODITY_TRANSLATIONS[lang]?.[normalized] || name;
+}
+
+function getTranslatedLocation(loc, lang) {
+  const normalized = String(loc).trim().toLowerCase();
+  return LOCATION_TRANSLATIONS[lang]?.[normalized] || loc;
+}
 
 function changeLanguage(langCode) {
   localStorage.setItem('cropiq_lang', langCode);
@@ -763,7 +860,42 @@ function changeLanguage(langCode) {
   writeText('lblStepMandi', t.lbl_step_mandi);
   writeText('lblTitleMandi', t.lbl_title_mandi);
   writeText('lblSubMandi', t.lbl_sub_mandi);
+
+  // Webcam Button
+  writeText('webcamBtnText', t.btn_webcam);
+
+  // Placeholders
+  const nInput = document.getElementById('nitrogen');
+  const pInput = document.getElementById('phosphorus');
+  const kInput = document.getElementById('potassium');
+  const tInput = document.getElementById('temperature');
+  const hInput = document.getElementById('humidity');
+  const phInput = document.getElementById('ph');
+  const rInput = document.getElementById('rainfall');
+
+  if (nInput) nInput.placeholder = t.placeholder_n;
+  if (pInput) pInput.placeholder = t.placeholder_p;
+  if (kInput) kInput.placeholder = t.placeholder_k;
+  if (tInput) tInput.placeholder = t.placeholder_temp;
+  if (hInput) hInput.placeholder = t.placeholder_hum;
+  if (phInput) phInput.placeholder = t.placeholder_ph;
+  if (rInput) rInput.placeholder = t.placeholder_rain;
+
+  // Typical Range Hints
+  writeText('hintN', t.hint_n);
+  writeText('hintP', t.hint_p);
+  writeText('hintK', t.hint_k);
+  writeText('hintTemp', t.hint_temp);
+  writeText('hintHum', t.hint_hum);
+  writeText('hintPh', t.hint_ph);
+  writeText('hintRain', t.hint_rain);
+
+  // Live Mandi Prices list re-rendering
+  if (lastFetchedMandiPrices && lastFetchedMandiPrices.length > 0) {
+    renderMandiList(lastFetchedMandiPrices);
+  }
 }
+
 
 // =======================
 // 🩺 AI LEAF DISEASE PREDICTION
@@ -863,6 +995,53 @@ async function submitDiseaseDiagnosis() {
 // =======================
 // 📈 MANDI PRICES LOADER
 // =======================
+let lastFetchedMandiPrices = [];
+
+function renderMandiList(prices) {
+  const grid = document.getElementById('mandiPricesGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  
+  const currentLang = localStorage.getItem('cropiq_lang') || 'en';
+
+  prices.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'mandi-card';
+
+    const isUp = p.trend === 'up';
+    const trendBadge = isUp 
+      ? `<span class="mandi-trend-badge trend-up">▲ UP</span>` 
+      : `<span class="mandi-trend-badge trend-down">▼ DOWN</span>`;
+
+    const commodityName = getTranslatedCommodity(p.commodity, currentLang);
+    const mandiName = getTranslatedLocation(p.mandi, currentLang);
+    const stateName = getTranslatedLocation(p.state, currentLang);
+
+    card.innerHTML = `
+      <div class="mandi-header">
+        <div>
+          <h3 class="mandi-commodity">${commodityName}</h3>
+          <span class="mandi-location">${mandiName}, ${stateName}</span>
+        </div>
+        ${trendBadge}
+      </div>
+      <div class="mandi-prices-row">
+        <div>
+          <span class="mandi-price-lbl">Average Price</span>
+          <div class="mandi-price-val">₹${p.avg} <span style="font-size:0.7rem; font-weight:500; opacity:0.6;">/ quintal</span></div>
+          <div style="font-size:0.75rem; font-weight:600; color:var(--marigold-500); margin-top:2px;">(₹${(p.avg / 100).toFixed(2)} / kg)</div>
+        </div>
+        <div style="text-align: right;">
+          <span class="mandi-price-lbl">Range (Min - Max)</span>
+          <div style="font-size:0.85rem; font-weight:600; margin-top:2px;">₹${p.min} - ₹${p.max}</div>
+          <span style="font-size:0.68rem; opacity:0.6;">(₹${(p.min / 100).toFixed(1)} - ₹${(p.max / 100).toFixed(1)} / kg)</span>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
 async function fetchMandiPrices() {
   if (!isLoggedIn()) {
     showLoginModal();
@@ -881,39 +1060,8 @@ async function fetchMandiPrices() {
     const data = await response.json();
     if (!response.ok) throw new Error("Could not retrieve market rates");
 
-    grid.innerHTML = '';
-    data.prices.forEach(p => {
-      const card = document.createElement('div');
-      card.className = 'mandi-card';
-
-      const isUp = p.trend === 'up';
-      const trendBadge = isUp 
-        ? `<span class="mandi-trend-badge trend-up">▲ UP</span>` 
-        : `<span class="mandi-trend-badge trend-down">▼ DOWN</span>`;
-
-      card.innerHTML = `
-        <div class="mandi-header">
-          <div>
-            <h3 class="mandi-commodity">${p.commodity}</h3>
-            <span class="mandi-location">${p.mandi}, ${p.state}</span>
-          </div>
-          ${trendBadge}
-        </div>
-        <div class="mandi-prices-row">
-          <div>
-            <span class="mandi-price-lbl">Average Price</span>
-            <div class="mandi-price-val">₹${p.avg} <span style="font-size:0.7rem; font-weight:500; opacity:0.6;">/ quintal</span></div>
-            <div style="font-size:0.75rem; font-weight:600; color:var(--marigold-500); margin-top:2px;">(₹${(p.avg / 100).toFixed(2)} per kg)</div>
-          </div>
-          <div style="text-align: right;">
-            <span class="mandi-price-lbl">Range (Min - Max)</span>
-            <div style="font-size:0.85rem; font-weight:600; margin-top:2px;">₹${p.min} - ₹${p.max}</div>
-            <span style="font-size:0.68rem; opacity:0.6;">(₹${(p.min / 100).toFixed(1)} - ₹${(p.max / 100).toFixed(1)} per kg)</span>
-          </div>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
+    lastFetchedMandiPrices = data.prices;
+    renderMandiList(data.prices);
 
   } catch (err) {
     grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#b91c1c; font-weight:600;">Error: ${err.message}</div>`;
