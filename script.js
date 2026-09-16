@@ -10,7 +10,12 @@
 // =======================
 // 🔗 API BASE URL
 // =======================
-const API_URL = "https://smart-crop-advisory-system-2.onrender.com";
+const API_URL = (typeof window !== 'undefined' && window.CROPIQ_API_URL)
+  ? window.CROPIQ_API_URL
+  : (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+    ? (window.location.port === '10000' ? '' : 'http://127.0.0.1:10000')
+    : "https://smart-crop-advisory-system-2.onrender.com";
+
 
 // =======================
 // 🔑 AUTH HEADER HELPER
