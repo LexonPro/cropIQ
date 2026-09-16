@@ -8,4 +8,6 @@ passlib[bcrypt]
 python-jose[cryptography]
 python-multipart
 Pillow
+torch
+torchvision
 

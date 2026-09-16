@@ -3,3 +3,6 @@ node_modules/
 __pycache__/
 *.pyc
 backend/models/*.csv
+backend/.venv/
+.venv/
+scratch/
